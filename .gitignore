@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### Project ###
-**/application.yaml
+**/application.yml
 docs
 
 # macOS system files
