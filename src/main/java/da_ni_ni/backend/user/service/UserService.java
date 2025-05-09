@@ -28,6 +28,7 @@ public class UserService {
 
         User user = User.builder()
                 .name(request.getName())
+                .nickname(request.getName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .build();
