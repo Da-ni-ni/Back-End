@@ -1,5 +1,6 @@
 package da_ni_ni.backend.user;
 
+import da_ni_ni.backend.user.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

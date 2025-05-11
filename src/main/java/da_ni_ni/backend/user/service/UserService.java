@@ -7,7 +7,7 @@ import da_ni_ni.backend.user.dto.SignupRequestDto;
 import da_ni_ni.backend.user.exception.DuplicateEmailException;
 import da_ni_ni.backend.user.exception.LoginFailedException;
 import da_ni_ni.backend.user.repository.UserRepository;
-import da_ni_ni.backend.user.JwtTokenProvider;
+import da_ni_ni.backend.user.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,6 @@ public class UserService {
 
         User user = User.builder()
                 .name(request.getName())
-                .nickname(request.getName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .build();
@@ -46,7 +45,7 @@ public class UserService {
         }
 
         String token = jwtTokenProvider.createToken(user.getEmail());
-        Long groupId = user.getGroup().getId();
+        Long groupId = (user.getFamilyGroup() != null) ? user.getFamilyGroup().getId() : null;
 
         return new LoginResponseDto(
                 user.getName(),

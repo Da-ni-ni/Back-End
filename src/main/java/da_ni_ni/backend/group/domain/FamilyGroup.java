@@ -1,6 +1,5 @@
 package da_ni_ni.backend.group.domain;
 
-import da_ni_ni.backend.global.domain.BaseTime;
 import da_ni_ni.backend.group.dto.UpdateGroupNameData;
 import da_ni_ni.backend.user.domain.User;
 import jakarta.persistence.*;
@@ -15,11 +14,11 @@ import java.util.Random;
 @Getter @Builder @Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Group extends BaseTime {
+public class FamilyGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "group_id")
+    @Column(name = "family_group_id")
     private Long id;
 
     private String name;
@@ -29,8 +28,8 @@ public class Group extends BaseTime {
     @JoinColumn(name = "admin_user_id")
     private User adminUser;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    private List<User> users = new ArrayList<>();
+    @OneToMany(mappedBy = "familyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<User> users = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -41,7 +40,7 @@ public class Group extends BaseTime {
 
     public void addUser(User user) {
         users.add(user);
-        user.setGroup(this);
+        user.setFamilyGroup(this);
     }
 
     public static String generateRandomCode() {
@@ -54,8 +53,8 @@ public class Group extends BaseTime {
         return code.toString();
     }
 
-    public static Group create(String name, User adminUser) {
-        return Group.builder()
+    public static FamilyGroup create(String name, User adminUser) {
+        return FamilyGroup.builder()
                 .name(name)
                 .adminUser(adminUser)
                 .inviteCode(generateRandomCode())

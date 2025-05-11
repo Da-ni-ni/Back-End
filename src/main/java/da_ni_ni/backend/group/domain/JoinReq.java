@@ -1,7 +1,5 @@
 package da_ni_ni.backend.group.domain;
 
-
-import da_ni_ni.backend.global.domain.BaseTime;
 import da_ni_ni.backend.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JoinReq extends BaseTime {
+public class JoinReq {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "request_id")
@@ -29,8 +27,8 @@ public class JoinReq extends BaseTime {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @JoinColumn(name = "family_group_id")
+    private FamilyGroup familyGroup;
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status;

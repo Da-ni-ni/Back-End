@@ -3,6 +3,7 @@ package da_ni_ni.backend.group.controller;
 import da_ni_ni.backend.global.dto.ResponseDto;
 import da_ni_ni.backend.group.dto.*;
 import da_ni_ni.backend.group.service.GroupService;
+import da_ni_ni.backend.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,18 +22,22 @@ public class GroupController {
 
     // 그룹 생성
     @PostMapping
-    public ResponseEntity<ResponseDto> createGroup (@RequestHeader("Authorization") String authHeader, @RequestBody CreateGroupRequest request) {
-        log.info("Request to POST group");
-        Long userId = authService.getUserFromHeader(authHeader).getId();
+    public ResponseEntity<ResponseDto> createGroup (
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody CreateGroupRequest request) {
+        log.info("Request to POST familyGroup");
+        Long userId = authService.getCurrentUser().getId();
         CreateGroupResponse response = groupService.createGroup(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 가입 요청
     @PostMapping("/join-request")
-    public ResponseEntity<ResponseDto> requestJoin (@RequestHeader("Authorization") String authHeader, @RequestBody JoinGroupRequest request) {
+    public ResponseEntity<ResponseDto> requestJoin (
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody JoinGroupRequest request) {
         log.info("Request to POST join request");
-        Long userId = authService.getUserFromHeader(authHeader).getId();
+        Long userId = authService.getCurrentUser().getId();
         JoinGroupResponse response = groupService.requestJoin(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -48,27 +53,32 @@ public class GroupController {
 
     // 가입 요청 목록 조회 (생성자만)
     @GetMapping("/join-request")
-    public ResponseEntity<ResponseDto> getJoinRequestList (@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<ResponseDto> getJoinRequestList (
+            @RequestHeader("Authorization") String authHeader) {
         log.info("Request to Get request list");
-        Long userId = authService.getUserFromHeader(authHeader).getId();
+        Long userId = authService.getCurrentUser().getId();
         GetJoinStatusListResponse response = groupService.getJoinRequestsList(userId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 가입 요청 수락 (생성자만)
     @PostMapping("/join-accept")
-    public ResponseEntity<ResponseDto> acceptJoinRequest (@RequestHeader("Authorization") String authHeader, @RequestBody ApprovejoinRequest request) {
+    public ResponseEntity<ResponseDto> acceptJoinRequest (
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody ApprovejoinRequest request) {
         log.info("Request to POST request accept");
-        Long userId = authService.getUserFromHeader(authHeader).getId();
-        ApprovejoinResponse response = groupService.acceptJoinRequest(userId, request);
+        Long userId = authService.getCurrentUser().getId();
+        ApprovejoinResponse response = groupService.approveJoinRequest(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 그룹명 수정
     @PutMapping
-    private ResponseEntity<ResponseDto> updateGroupName (@RequestHeader("Authorization") String authHeader, @RequestBody UpdateGroupNameRequest request) {
-        log.info("Request to PUT group name");
-        Long userId = authService.getUserFromHeader(authHeader).getId();
+    private ResponseEntity<ResponseDto> updateGroupName (
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody UpdateGroupNameRequest request) {
+        log.info("Request to PUT familyGroup name");
+        Long userId = authService.getCurrentUser().getId();
         UpdateGroupNameResponse response = groupService.updateGroupName(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -1,12 +1,11 @@
 package da_ni_ni.backend.user.domain;
 
-import da_ni_ni.backend.global.domain.BaseTime;
-import da_ni_ni.backend.group.domain.Group;
+import da_ni_ni.backend.group.domain.FamilyGroup;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-//import da_ni_ni.backend.group.domain.Groups;
-import java.time.LocalDateTime;
+//import da_ni_ni.backend.familyGroup.domain.Groups;
+
 
 @Entity
 @Table(name = "users") // DB 테이블명은 소문자 복수형 추천
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class User extends BaseTime {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,10 +32,10 @@ public class User extends BaseTime {
     private String nickName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @JoinColumn(name = "family_group_id")
+    private FamilyGroup familyGroup;
 
-    @NotEmpty
-    private String role;
-
+    public void updateNickname(String nickName) {
+        this.nickName = nickName;
+    }
 }

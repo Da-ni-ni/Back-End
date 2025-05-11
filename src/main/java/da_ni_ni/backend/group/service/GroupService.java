@@ -1,6 +1,6 @@
 package da_ni_ni.backend.group.service;
 
-import da_ni_ni.backend.group.domain.Group;
+import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.group.domain.JoinReq;
 import da_ni_ni.backend.group.dto.*;
 import da_ni_ni.backend.group.exception.*;
@@ -31,25 +31,25 @@ public class GroupService {
     public CreateGroupResponse createGroup(Long userId, CreateGroupRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Group group = Group.create(request.getGroupName(), user);
-        group.addUser(user);
-        groupRepository.save(group);
-        return CreateGroupResponse.createWith(group);
+        FamilyGroup familyGroup = FamilyGroup.create(request.getGroupName(), user);
+        familyGroup.addUser(user);
+        groupRepository.save(familyGroup);
+        return CreateGroupResponse.createWith(familyGroup);
     }
 
     // 가입 요청
     public JoinGroupResponse requestJoin(Long userId, JoinGroupRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Group group = groupRepository.findByInviteCode(request.getInviteCode())
+        FamilyGroup familyGroup = groupRepository.findByInviteCode(request.getInviteCode())
                 .orElseThrow(InviteCodeNotFoundException::new);
         // 이미 가입이 된 유저 예외 처리
-        if (user.getGroup() != null) throw new AlreadyInGroupException();
+        if (user.getFamilyGroup() != null) throw new AlreadyInGroupException();
 
         // 가입 요청 생성
         JoinReq joinReq = JoinReq.builder()
                 .user(user)
-                .group(group)
+                .familyGroup(familyGroup)
                 .inviteCode(request.getInviteCode())
                 .status(JoinReq.RequestStatus.PENDING)
                 .build();
@@ -71,10 +71,10 @@ public class GroupService {
     public GetJoinStatusListResponse getJoinRequestsList(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Group group = groupRepository.findByAdminUser(user)
+        FamilyGroup familyGroup = groupRepository.findByAdminUser(user)
                 .orElseThrow(GroupNotFoundException::new);
 
-        List<JoinReq> requests = joinRequestRepository.findAllByInviteCode(group.getInviteCode());
+        List<JoinReq> requests = joinRequestRepository.findAllByInviteCode(familyGroup.getInviteCode());
         List<GetJoinStatusResponse> list = requests.stream()
                 .map(req -> new GetJoinStatusResponse(
                         req.getId(),
@@ -90,9 +90,9 @@ public class GroupService {
     public ApprovejoinResponse approveJoinRequest(Long userId, ApprovejoinRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Group group = groupRepository.findByAdminUser(user)
+        FamilyGroup familyGroup = groupRepository.findByAdminUser(user)
                 .orElseThrow(GroupNotFoundException::new);
-        List<JoinReq> joinReq = joinRequestRepository.findAllByInviteCode(group.getInviteCode());
+        List<JoinReq> joinReq = joinRequestRepository.findAllByInviteCode(familyGroup.getInviteCode());
         if (joinReq.isEmpty()) {
             throw new InvitationRequestNotFoundException();
         }
@@ -103,7 +103,7 @@ public class GroupService {
 
         // 요청 수락
         if (request.getStatus() == JoinReq.RequestStatus.APPROVED) {
-            group.addUser(targetRequest.getUser()); // 그룹에 요청 유저 추가
+            familyGroup.addUser(targetRequest.getUser()); // 그룹에 요청 유저 추가
             joinRequestRepository.delete(targetRequest); // 요청 목록에서 처리 완료된 요청 삭제
         }
         // 요청 거절
@@ -120,14 +120,14 @@ public class GroupService {
     public UpdateGroupNameResponse updateGroupName(Long userId, UpdateGroupNameRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Group group = user.getGroup();
-        if (group == null) {
+        FamilyGroup familyGroup = user.getFamilyGroup();
+        if (familyGroup == null) {
             throw new GroupNotFoundException();
         }
         UpdateGroupNameData updateGroupNameData = UpdateGroupNameData.createWith(request);
-        group.updateName(updateGroupNameData);
-        groupRepository.save(group);
-        return UpdateGroupNameResponse.createWith(group);
+        familyGroup.updateName(updateGroupNameData);
+        groupRepository.save(familyGroup);
+        return UpdateGroupNameResponse.createWith(familyGroup);
     }
 
 

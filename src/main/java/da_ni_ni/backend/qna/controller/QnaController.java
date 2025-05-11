@@ -88,7 +88,7 @@ public class QnaController {
         // “오늘 활성화된 질문인지”와 “내 답변 생성 시점이 논리적 오늘인지”를 모두 검증합니다.
         String updatedAt = qnaService.updateAnswer(questionId, req);
 
-        Long userId = authService.getCurrentUser().getUserId();
+        Long userId = authService.getCurrentUser().getId();
         UpdatedResponse body = new UpdatedResponse(
                 questionId,
                 userId,
