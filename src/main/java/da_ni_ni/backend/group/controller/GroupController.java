@@ -23,7 +23,6 @@ public class GroupController {
     // 그룹 생성
     @PostMapping
     public ResponseEntity<ResponseDto> createGroup (
-            @RequestHeader("Authorization") String authHeader,
             @RequestBody CreateGroupRequest request) {
         log.info("Request to POST familyGroup");
         Long userId = authService.getCurrentUser().getId();
@@ -34,7 +33,6 @@ public class GroupController {
     // 가입 요청
     @PostMapping("/join-request")
     public ResponseEntity<ResponseDto> requestJoin (
-            @RequestHeader("Authorization") String authHeader,
             @RequestBody JoinGroupRequest request) {
         log.info("Request to POST join request");
         Long userId = authService.getCurrentUser().getId();
@@ -53,8 +51,7 @@ public class GroupController {
 
     // 가입 요청 목록 조회 (생성자만)
     @GetMapping("/join-request")
-    public ResponseEntity<ResponseDto> getJoinRequestList (
-            @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<ResponseDto> getJoinRequestList () {
         log.info("Request to Get request list");
         Long userId = authService.getCurrentUser().getId();
         GetJoinStatusListResponse response = groupService.getJoinRequestsList(userId);
@@ -64,7 +61,6 @@ public class GroupController {
     // 가입 요청 수락 (생성자만)
     @PostMapping("/join-accept")
     public ResponseEntity<ResponseDto> acceptJoinRequest (
-            @RequestHeader("Authorization") String authHeader,
             @RequestBody ApprovejoinRequest request) {
         log.info("Request to POST request accept");
         Long userId = authService.getCurrentUser().getId();
@@ -75,7 +71,6 @@ public class GroupController {
     // 그룹명 수정
     @PutMapping
     private ResponseEntity<ResponseDto> updateGroupName (
-            @RequestHeader("Authorization") String authHeader,
             @RequestBody UpdateGroupNameRequest request) {
         log.info("Request to PUT familyGroup name");
         Long userId = authService.getCurrentUser().getId();
