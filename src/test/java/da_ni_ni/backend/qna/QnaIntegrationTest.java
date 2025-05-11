@@ -48,7 +48,7 @@ class QnaIntegrationTest {
         questionRepo.deleteAll();
         userRepo.deleteAll();
 
-        // create approved users in same group
+        // create approved users in same familyGroup
         User user1 = new User();
         user1.setEmail("test");
         user1.setName("Test User");

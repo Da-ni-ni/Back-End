@@ -3,7 +3,7 @@ package da_ni_ni.backend.group.dto;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import da_ni_ni.backend.global.dto.ResponseDto;
-import da_ni_ni.backend.group.domain.Group;
+import da_ni_ni.backend.group.domain.FamilyGroup;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,11 +17,11 @@ public class CreateGroupResponse implements ResponseDto {
     private String inviteCode;
     private LocalDateTime createdAt;
 
-    public static CreateGroupResponse createWith(Group group) {
+    public static CreateGroupResponse createWith(FamilyGroup familyGroup) {
         return CreateGroupResponse.builder()
-                .groupId(group.getId())
-                .inviteCode(group.getInviteCode())
-                .createdAt(group.getCreatedAt())
+                .groupId(familyGroup.getId())
+                .inviteCode(familyGroup.getInviteCode())
+                .createdAt(familyGroup.getCreatedAt())
                 .build();
     }
 }

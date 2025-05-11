@@ -65,7 +65,7 @@ public class QnaService {
                 .orElseThrow(() -> new BadRequestException("잘못된 질문 ID입니다."));
 
         // 3) 내 답변이 있는지 확인 (없으면 403)
-        answerRepo.findByQuestionIdAndUserId(questionId, me.getUserId())
+        answerRepo.findByQuestionIdAndUserId(questionId, me.getId())
                 .orElseThrow(() -> new ForbiddenException(
                         "답변을 등록해야 다른 가족의 답변을 볼 수 있습니다."
                 ));
@@ -73,11 +73,11 @@ public class QnaService {
         // 4) 이후 실제 상세 DTO 조립
         List<QuestionDetailDto.AnswerInfo> answers = authService.getFamilyMembers().stream()
                 .map(m -> {
-                    String ans = answerRepo.findByQuestionIdAndUserId(questionId, m.getUserId())
+                    String ans = answerRepo.findByQuestionIdAndUserId(questionId, m.getId())
                             .map(DailyAnswer::getAnswerText)
                             .orElse("아직 답변을 작성하지 않았습니다.");
                     return new QuestionDetailDto.AnswerInfo(
-                            m.getUserId(), m.getNickname(), ans
+                            m.getId(), m.getNickName(), ans
                     );
                 })
                 .collect(Collectors.toList());
@@ -95,7 +95,7 @@ public class QnaService {
     @Transactional
     public String submitAnswer(Long questionId, AnswerRequestDto req) {
         User me = authService.getApprovedUser();
-        Long myId = me.getUserId();
+        Long myId = me.getId();
 
         if (answerRepo.findByQuestionIdAndUserId(questionId, myId).isPresent()) {
             throw new BadRequestException("이미 답변을 등록했습니다.");
@@ -116,7 +116,7 @@ public class QnaService {
     @Transactional
     public String updateAnswer(Long questionId, AnswerRequestDto req) {
         User me = authService.getApprovedUser();
-        Long myId = me.getUserId();
+        Long myId = me.getId();
 
         // 1) 논리적 오늘 계산 (오전 5시 기준)
         LocalDate logicalToday = getLogicalDate();
@@ -153,7 +153,7 @@ public class QnaService {
     @Transactional
     public Long deleteAnswer(Long questionId) {
         User me = authService.getApprovedUser();
-        Long myId = me.getUserId();
+        Long myId = me.getId();
 
         // 1) 논리적 오늘 계산 (오전 5시 기준)
         LocalDate logicalToday = getLogicalDate();

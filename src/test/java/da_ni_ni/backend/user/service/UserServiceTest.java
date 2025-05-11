@@ -1,6 +1,6 @@
 package da_ni_ni.backend.user.service;
 
-import da_ni_ni.backend.user.JwtTokenProvider;
+import da_ni_ni.backend.user.jwt.JwtTokenProvider;
 import da_ni_ni.backend.user.domain.User;
 import da_ni_ni.backend.user.dto.LoginRequestDto;
 import da_ni_ni.backend.user.dto.LoginResponseDto;

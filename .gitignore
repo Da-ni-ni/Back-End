@@ -42,3 +42,8 @@ docs
 
 # macOS system files
 *.DS_Store
+
+# JVM crash logs
+hs_err_pid*.log
+replay_pid*.log
+
