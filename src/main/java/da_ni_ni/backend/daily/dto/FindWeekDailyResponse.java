@@ -1,6 +1,6 @@
 package da_ni_ni.backend.daily.dto;
 
-import da_ni_ni.backend.global.dto.ResponseDto;
+import da_ni_ni.backend.common.ResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 

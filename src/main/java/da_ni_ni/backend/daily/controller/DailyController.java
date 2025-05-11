@@ -2,7 +2,7 @@ package da_ni_ni.backend.daily.controller;
 
 import da_ni_ni.backend.daily.dto.*;
 import da_ni_ni.backend.daily.service.DailyService;
-import da_ni_ni.backend.global.dto.ResponseDto;
+import da_ni_ni.backend.common.ResponseDto;
 import da_ni_ni.backend.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +72,7 @@ public class DailyController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
     // 좋아요 토글
-    @PostMapping("/{dailyId}/{dailyId}")
+    @PostMapping("/{dailyId}")
     public ResponseEntity<ResponseDto> toggleLike(
             @PathVariable("dailyId") Long dailyId) {
         log.info("Request to TOGGLE like");

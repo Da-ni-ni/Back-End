@@ -2,7 +2,7 @@ package da_ni_ni.backend.daily.service;
 
 import da_ni_ni.backend.daily.domain.Comment;
 import da_ni_ni.backend.daily.domain.Daily;
-import da_ni_ni.backend.daily.domain.Like;
+import da_ni_ni.backend.daily.domain.DailyLike;
 import da_ni_ni.backend.daily.dto.*;
 import da_ni_ni.backend.daily.exception.CommentNotFoundException;
 import da_ni_ni.backend.daily.exception.DailyNotFoundException;
@@ -66,13 +66,13 @@ public class DailyService {
     }
 
     // 게시글로 좋아요 조회
-    public List<Like> findLikeAllByDailyId(final Long dailyId) {
+    public List<DailyLike> findLikeAllByDailyId(final Long dailyId) {
         Daily daily = findById(dailyId);
-        List<Like> dailyLikes = likeRepository.findAllByDaily(daily);
-        if (dailyLikes.isEmpty()) {
+        List<DailyLike> dailyDailyLikes = likeRepository.findAllByDaily(daily);
+        if (dailyDailyLikes.isEmpty()) {
             throw new LikeNotFoundException(dailyId);
         }
-        return dailyLikes;
+        return dailyDailyLikes;
     }
 
 
@@ -122,8 +122,8 @@ public class DailyService {
         commentRepository.deleteAll(comments);
 
         // 게시글에 달린 좋아요 삭제
-        List<Like> likes = findLikeAllByDailyId(dailyId);
-        likeRepository.deleteAll(likes);
+        List<DailyLike> dailyLikes = findLikeAllByDailyId(dailyId);
+        likeRepository.deleteAll(dailyLikes);
 
         // 게시글 삭제
         dailyRepository.delete(daily);
@@ -193,25 +193,25 @@ public class DailyService {
                 .orElseThrow(UserNotFoundException::new);
         Daily daily = findById(dailyId);
 
-        Optional<Like> existingLike = likeRepository.findByDailyAndUser(daily, user);
+        Optional<DailyLike> existingLike = likeRepository.findByDailyAndUser(daily, user);
 
         // 좋아요가 이미 존재하면
         if (existingLike.isPresent()) {
-            Like like = existingLike.get();
+            DailyLike dailyLike = existingLike.get();
             // 내가 누른 좋아요일 경우 -> 좋아요 삭제
-            if (like.getUser().getId().equals(userId)) {
-                likeRepository.delete(like);
+            if (dailyLike.getUser().getId().equals(userId)) {
+                likeRepository.delete(dailyLike);
                 // 좋아요 - 1
                 daily.setLikeCount(daily.getLikeCount() - 1);
                 return new ToggleLikeResponse(false);
             }
             // 다른 사람이 누른 좋아요일 경우 -> 좋아요 등록
             else {
-                Like myLike = Like.builder()
+                DailyLike myDailyLike = DailyLike.builder()
                         .daily(daily)
                         .user(user)
                         .build();
-                likeRepository.save(myLike);
+                likeRepository.save(myDailyLike);
                 // 좋아요 + 1
                 daily.setLikeCount(daily.getLikeCount() + 1);
                 return new ToggleLikeResponse(true);
@@ -219,11 +219,11 @@ public class DailyService {
 
         } else {
             // 좋아요가 존재하지 않을 경우 -> 좋아요 등록
-            Like newLike = Like.builder()
+            DailyLike newDailyLike = DailyLike.builder()
                     .daily(daily)
                     .user((user))
                     .build();
-            likeRepository.save(newLike);
+            likeRepository.save(newDailyLike);
             // 좋아요 + 1
             daily.setLikeCount(daily.getLikeCount() + 1);
             return new ToggleLikeResponse(true);

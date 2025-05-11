@@ -1,6 +1,6 @@
 package da_ni_ni.backend.group.controller;
 
-import da_ni_ni.backend.global.dto.ResponseDto;
+import da_ni_ni.backend.common.ResponseDto;
 import da_ni_ni.backend.group.dto.*;
 import da_ni_ni.backend.group.service.GroupService;
 import da_ni_ni.backend.user.service.AuthService;
@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j

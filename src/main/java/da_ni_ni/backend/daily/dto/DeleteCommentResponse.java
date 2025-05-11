@@ -3,7 +3,7 @@ package da_ni_ni.backend.daily.dto;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import da_ni_ni.backend.daily.domain.Comment;
-import da_ni_ni.backend.global.dto.ResponseDto;
+import da_ni_ni.backend.common.ResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ public class DeleteCommentResponse implements ResponseDto {
 
     public static DeleteCommentResponse createWith(Comment comment) {
         return DeleteCommentResponse.builder()
-                .commentId(comment.getId())
+                .commentId(comment.getCommentId())
                 .build();
     }
 }
