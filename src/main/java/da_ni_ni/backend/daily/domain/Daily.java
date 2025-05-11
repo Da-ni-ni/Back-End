@@ -1,6 +1,7 @@
 package da_ni_ni.backend.daily.domain;
 
 import da_ni_ni.backend.daily.dto.UpdateDailyData;
+import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,10 @@ public class Daily {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "daily_id")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "family_group_id")
+    private FamilyGroup group;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
