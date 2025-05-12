@@ -1,3 +1,4 @@
+
 package da_ni_ni.backend.user.jwt;
 
 import jakarta.annotation.PostConstruct;
@@ -32,4 +33,3 @@ public class JwtTokenProperties {
         this.expirationMs = expirationMs;
     }
 }
-
