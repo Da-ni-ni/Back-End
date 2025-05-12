@@ -23,40 +23,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-/*    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-
-        String token = resolveToken(request);
-
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication auth = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        filterChain.doFilter(request, response);
-    }*/
-
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws java.io.IOException, jakarta.servlet.ServletException {
+            throws IOException, ServletException {
 
-        String header = req.getHeader("Authorization");
-        String token = (header != null && header.startsWith("Bearer "))
-                ? header.substring(7) : null;
+        String token = resolveToken(req);
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+            // JWT에서 이메일 추출
             String email = jwtTokenProvider.getEmail(token);
+
+            // 이메일을 기반으로 사용자 정보 가져오기
             var userDetails = userDetailsService.loadUserByUsername(email);
 
+            // 인증 객체 생성 및 SecurityContext에 설정
             var auth = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
+        // 다음 필터로 진행
         chain.doFilter(req, res);
     }
 
@@ -68,35 +55,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
-
-/*}
-
-    private final da_ni_ni.backend.user.jwt.JwtTokenProvider tokenProvider;
-    private final UserDetailsService userDetailsService;
-
-    public JwtAuthenticationFilter(da_ni_ni.backend.user.jwt.JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
-        this.tokenProvider = tokenProvider;
-        this.userDetailsService = userDetailsService;
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws java.io.IOException, jakarta.servlet.ServletException {
-
-        String header = req.getHeader("Authorization");
-        String token = (header != null && header.startsWith("Bearer "))
-                ? header.substring(7) : null;
-
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            String email = tokenProvider.getEmail(token);
-            var userDetails = userDetailsService.loadUserByUsername(email);
-
-            var auth = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        chain.doFilter(req, res);
-    }
-}*/

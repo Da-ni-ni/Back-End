@@ -5,7 +5,6 @@ import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.swing.*;
 import java.time.LocalDate;
 import java.util.List;
 

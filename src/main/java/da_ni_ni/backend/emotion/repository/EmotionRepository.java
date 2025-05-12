@@ -1,7 +1,6 @@
 package da_ni_ni.backend.emotion.repository;
 
 import da_ni_ni.backend.emotion.domain.Emotion;
-import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

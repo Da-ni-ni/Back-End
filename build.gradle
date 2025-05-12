@@ -42,6 +42,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// SLF4J API 의존성
+	implementation 'org.slf4j:slf4j-api:2.0.0'
+
 	// 테스트 시 임베디드 DB (H2) 추가
 	testImplementation 'com.h2database:h2'
 
@@ -61,3 +64,5 @@ test {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+

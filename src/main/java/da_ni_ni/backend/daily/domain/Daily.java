@@ -38,6 +38,7 @@ public class Daily {
     private long commentCount;
     private long likeCount;
 
+    @Builder.Default
     @OneToMany(mappedBy = "daily", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
