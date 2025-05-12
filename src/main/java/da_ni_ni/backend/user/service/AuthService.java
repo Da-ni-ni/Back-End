@@ -33,7 +33,7 @@ public class AuthService {
     /** 가입 승인된 그룹에 속한 사용자만 반환 */
     public User getApprovedUser() {
         User me = getCurrentUser();
-        if (me.getGroupId() == null) {
+        if (me.getFamilyGroup().getId() == null) {
             throw new ForbiddenException("가입 승인된 그룹이 없습니다.");
         }
         return me;
@@ -42,6 +42,6 @@ public class AuthService {
     /** 가입 승인된 그룹의 모든 멤버 조회 */
     public List<User> getFamilyMembers() {
         User me = getApprovedUser();
-        return userRepo.findAllByGroupId(me.getGroupId());
+        return userRepo.findAllByFamilyGroup(me.getFamilyGroup());
     }
 }

@@ -1,22 +1,25 @@
 package da_ni_ni.backend.user.domain;
 
+import da_ni_ni.backend.group.domain.FamilyGroup;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-//import da_ni_ni.backend.group.domain.Groups;
-import java.time.LocalDateTime;
+//import da_ni_ni.backend.familyGroup.domain.Groups;
+
 
 @Entity
 @Table(name = "users") // DB 테이블명은 소문자 복수형 추천
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;  // 회원 고유 식별자
+    @Column(name = "user_id")
+    private Long id;  // 회원 고유 식별자
 
     private String name;
 
@@ -26,25 +29,13 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;  // 암호화된 비밀번호
 
-    private String nickname;
+    private String nickName;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "group_id")
-//    private Groups group;  // 가입된 가족 그룹 (없을 수도 있음)
-    @Column(name = "group_id")
-    private Long groupId;    // 그룹생성전
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "family_group_id")
+    private FamilyGroup familyGroup;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    public void updateNickname(String nickName) {
+        this.nickName = nickName;
     }
 }

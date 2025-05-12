@@ -52,7 +52,7 @@ class AuthServiceIntegrationTest {
         // 그룹이 없는 유저
         userNoGroup = userRepo.save(User.builder()
                 .name("noGroup")
-                .email("no@group.com")
+                .email("no@familyGroup.com")
                 .passwordHash("irrelevant")
                 .groupId(null)
                 .build());
@@ -60,13 +60,13 @@ class AuthServiceIntegrationTest {
         // 그룹 A 소속 유저 두 명
         userInGroupA = userRepo.save(User.builder()
                 .name("memberA1")
-                .email("a1@group.com")
+                .email("a1@familyGroup.com")
                 .passwordHash("pw")
                 .groupId(100L)
                 .build());
         userInGroupB = userRepo.save(User.builder()
                 .name("memberA2")
-                .email("a2@group.com")
+                .email("a2@familyGroup.com")
                 .passwordHash("pw")
                 .groupId(100L)
                 .build());
@@ -139,6 +139,6 @@ class AuthServiceIntegrationTest {
         var members = authService.getFamilyMembers();
         assertThat(members)
                 .extracting(User::getEmail)
-                .containsExactlyInAnyOrder("a1@group.com", "a2@group.com");
+                .containsExactlyInAnyOrder("a1@familyGroup.com", "a2@familyGroup.com");
     }
 }
