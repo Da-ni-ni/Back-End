@@ -26,7 +26,7 @@ public class UpdateEmotionResponse implements ResponseDto {
                 .emotionId(emotion.getId())
                 .nickName(emotion.getUser().getNickName())
                 .emotionType(emotion.getEmotionType())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(emotion.getUpdatedAt())
                 .build();
     }
 }

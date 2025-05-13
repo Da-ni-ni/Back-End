@@ -22,7 +22,7 @@ public class CreateEmotionResponse implements ResponseDto {
         return CreateEmotionResponse.builder()
                 .emotionId(emotion.getId())
                 .emotionType(emotion.getEmotionType())
-                .createdAt(LocalDateTime.now())
+                .createdAt(emotion.getCreatedAt())
                 .build();
     }
 }
