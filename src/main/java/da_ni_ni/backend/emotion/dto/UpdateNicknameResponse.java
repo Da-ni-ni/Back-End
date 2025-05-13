@@ -19,7 +19,7 @@ public class UpdateNicknameResponse implements ResponseDto {
 
     public static UpdateNicknameResponse createWith(Emotion emotion) {
         return UpdateNicknameResponse.builder()
-                .emotionId(emotion.getUser().getId())
+                .emotionId(emotion.getId())
                 .nickName(emotion.getUser().getNickName())
                 .updatedAt(emotion.getUpdatedAt())
                 .build();
