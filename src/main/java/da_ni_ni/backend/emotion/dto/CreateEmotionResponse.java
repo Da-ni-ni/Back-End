@@ -14,13 +14,15 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateEmotionResponse implements ResponseDto {
-    private EmotionType emotion;
+    private Long emotionId;
+    private EmotionType emotionType;
     private LocalDateTime createdAt;
 
     public static CreateEmotionResponse createWith(Emotion emotion) {
         return CreateEmotionResponse.builder()
-                .emotion(emotion.getType())
-                .createdAt(emotion.getCreatedAt())
+                .emotionId(emotion.getId())
+                .emotionType(emotion.getEmotionType())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

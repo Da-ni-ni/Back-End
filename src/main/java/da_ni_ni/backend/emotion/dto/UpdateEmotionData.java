@@ -8,12 +8,12 @@ import lombok.Getter;
 @Builder
 public class UpdateEmotionData {
     private String nickName;
-    private EmotionType emotion;
+    private EmotionType emotionType;
 
     public static UpdateEmotionData createWith(UpdateEmotionRequest request) {
         return UpdateEmotionData.builder()
                 .nickName(request.getNickName())
-                .emotion(request.getEmotion())
+                .emotionType(request.getEmotionType())
                 .build();
     }
 

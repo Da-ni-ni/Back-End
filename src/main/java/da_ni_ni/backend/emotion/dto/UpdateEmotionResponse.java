@@ -16,15 +16,17 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateEmotionResponse implements ResponseDto {
+    private Long emotionId;
     private String nickName;
-    private EmotionType emotion;
+    private EmotionType emotionType;
     private LocalDateTime updatedAt;
 
     public static UpdateEmotionResponse createWith(Emotion emotion) {
         return UpdateEmotionResponse.builder()
+                .emotionId(emotion.getId())
                 .nickName(emotion.getUser().getNickName())
-                .emotion(emotion.getType())
-                .updatedAt(emotion.getUpdatedAt())
+                .emotionType(emotion.getEmotionType())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }

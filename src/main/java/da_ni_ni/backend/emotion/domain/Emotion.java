@@ -22,33 +22,30 @@ public class Emotion {
     @Column(name = "emotion_id")
     private Long id;
 
-    private LocalDate date;
-
     @ManyToOne
     @JoinColumn(name = "group_id")
     private FamilyGroup group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "emotion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private User user;
 
     @Enumerated(EnumType.STRING)
-    private EmotionType type;
+    private EmotionType emotionType;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
 
-    public static Emotion create(User user, EmotionType type, LocalDateTime createdAt) {
+    public static Emotion create(User user, EmotionType emotionType, LocalDateTime createdAt) {
         return Emotion.builder()
                 .user(user)
-                .type(type)
+                .emotionType(emotionType)
                 .createdAt(createdAt)
                 .build();
     }
 
     public void updateType (UpdateEmotionData data) {
-        this.type = data.getEmotion();
+        this.emotionType = data.getEmotionType();
     }
 
 }

@@ -45,13 +45,11 @@ public class UserService {
         }
 
         String token = jwtTokenProvider.createToken(user.getEmail());
-        Long groupId = (user.getFamilyGroup() != null) ? user.getFamilyGroup().getId() : null;
 
         return new LoginResponseDto(
                 user.getName(),
                 user.getEmail(),
-                token,
-                groupId
+                token
         );
     }
 

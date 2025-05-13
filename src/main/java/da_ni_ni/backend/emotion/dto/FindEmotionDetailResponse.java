@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class FindEmotionDetailResponse implements ResponseDto {
-    private Long userId;
-    private String name;
-    private EmotionType emotion;
+    private Long emotionId;
+    private String nickName;
+    private EmotionType emotionType;
     private LocalDateTime updatedAt;
 
     public static FindEmotionDetailResponse createWith(Emotion emotion) {
         return FindEmotionDetailResponse.builder()
-                .userId(emotion.getUser().getId())
-                .name(emotion.getUser().getNickName())
-                .emotion(emotion.getType())
+                .emotionId(emotion.getId())
+                .nickName(emotion.getUser().getNickName())
+                .emotionType(emotion.getEmotionType())
                 .updatedAt(emotion.getUpdatedAt())
                 .build();
     }

@@ -12,6 +12,5 @@ import java.time.LocalDate;
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateEmotionRequest {
-    private LocalDate date;
-    private EmotionType emotion;
+    private EmotionType emotionType;
 }

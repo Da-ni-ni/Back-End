@@ -36,9 +36,8 @@ public class EmotionService {
             throw new GroupNotFoundException();  // 그룹이 없을 경우 예외 처리
         }
         Emotion emotion = Emotion.builder()
-                .date(LocalDate.now())
                 .user(user)
-                .type(request.getEmotion())
+                .emotionType(request.getEmotionType())
                 .build();
         emotionRepository.save(emotion);
         return CreateEmotionResponse.createWith(emotion);
@@ -48,7 +47,7 @@ public class EmotionService {
     public UpdateEmotionResponse updateEmotionResponse(UpdateEmotionRequest request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Emotion emotion = emotionRepository.findByUserAndDate(user, LocalDate.now())
+        Emotion emotion = emotionRepository.findById(user.getEmotion().getId())
                 .orElseThrow(EmotionNotFoundException::new);
         // 본인의 감정만 수정 가능
         if (!emotion.getUser().getId().equals(user.getId())) {

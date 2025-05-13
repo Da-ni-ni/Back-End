@@ -39,14 +39,14 @@ public class GroupController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-/*    // 내 가입 요청 상태 조회
+    // 내 가입 요청 상태 조회
     @GetMapping("/join-request/me")
     public ResponseEntity<ResponseDto> getMyRequestStatus (@RequestHeader("Authorization") String authHeader) {
         log.info("Request to Get my request status");
-        Long userId = authService.getUserFromHeader(authHeader).getId();
+        Long userId = authService.getCurrentUser().getId();
         GetJoinStatusResponse response = groupService.getMyJoinStatus(userId);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }*/
+    }
 
     // 가입 요청 목록 조회 (생성자만)
     @GetMapping("/join-request")

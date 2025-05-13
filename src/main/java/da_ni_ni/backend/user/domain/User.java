@@ -1,5 +1,6 @@
 package da_ni_ni.backend.user.domain;
 
+import da_ni_ni.backend.emotion.domain.Emotion;
 import da_ni_ni.backend.group.domain.FamilyGroup;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -34,6 +35,10 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "family_group_id")
     private FamilyGroup familyGroup;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emotion_id")
+    private Emotion emotion;
 
     public void updateNickname(String nickName) {
         this.nickName = nickName;
