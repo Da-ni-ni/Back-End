@@ -24,7 +24,7 @@ public class FamilyGroup {
     private String name;
     private String inviteCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_user_id")
     private User adminUser;
 
@@ -58,6 +58,7 @@ public class FamilyGroup {
                 .name(name)
                 .adminUser(adminUser)
                 .inviteCode(generateRandomCode())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 

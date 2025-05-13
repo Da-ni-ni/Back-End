@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,11 @@ public class GroupService {
     public CreateGroupResponse createGroup(Long userId, CreateGroupRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
+
+        // 이미 만든 그룹이 있는지 확인
+        if (groupRepository.existsByAdminUser(user)) {
+            throw new IllegalStateException("사용자는 하나의 그룹만 생성할 수 있습니다.");
+        }
         FamilyGroup familyGroup = FamilyGroup.create(request.getGroupName(), user);
         familyGroup.addUser(user);
         groupRepository.save(familyGroup);
@@ -52,20 +58,21 @@ public class GroupService {
                 .familyGroup(familyGroup)
                 .inviteCode(request.getInviteCode())
                 .status(JoinReq.RequestStatus.PENDING)
+                .createdAt(LocalDateTime.now())
                 .build();
         joinRequestRepository.save(joinReq);
 
         return JoinGroupResponse.createWith(joinReq);
     }
 
-/*    // 가입 요청 상태 조회 (본인이 보낸 요청만 확인 가능)
+    // 내 가입 요청 상태 조회
     public GetJoinStatusResponse getMyJoinStatus(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         JoinReq joinReq = joinRequestRepository.findByUser(user)
                 .orElseThrow(InvitationRequestNotFoundException::new);
         return GetJoinStatusResponse.createWith(joinReq);
-    }*/
+    }
 
     // 가입 요청 목록 조회 (생성자만 확인 가능) (O)
     public GetJoinStatusListResponse getJoinRequestsList(Long userId) {
@@ -103,12 +110,15 @@ public class GroupService {
 
         // 요청 수락
         if (request.getStatus() == JoinReq.RequestStatus.APPROVED) {
+            targetRequest.setStatus(JoinReq.RequestStatus.APPROVED); // 상태 업데이트
+            targetRequest.setUpdatedAt(LocalDateTime.now());
             familyGroup.addUser(targetRequest.getUser()); // 그룹에 요청 유저 추가
-            joinRequestRepository.delete(targetRequest); // 요청 목록에서 처리 완료된 요청 삭제
+            // joinRequestRepository.delete(targetRequest); // 요청 목록에서 처리 완료된 요청 삭제
         }
         // 요청 거절
         else if (request.getStatus() == JoinReq.RequestStatus.REJECTED) {
-            joinRequestRepository.delete(targetRequest); // 요청 목록에서 처리 완료된 요청 삭제
+            targetRequest.setStatus(JoinReq.RequestStatus.REJECTED);
+            // joinRequestRepository.delete(targetRequest); // 요청 목록에서 처리 완료된 요청 삭제
         }
         else {
             throw new InvaildStatusException();

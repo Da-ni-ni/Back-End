@@ -1,5 +1,6 @@
 package da_ni_ni.backend.user.jwt;
 
+import da_ni_ni.backend.user.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
@@ -16,48 +18,42 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService userDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
 
-/*    @Override
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
         String token = resolveToken(request);
+        logger.info("[JwtFilter] Authorization Header: " + request.getHeader("Authorization"));
+        logger.info("[JwtFilter] Extracted Token: " + token);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication auth = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            logger.info("[JwtFilter] Token is valid");
+
+            String email = jwtTokenProvider.getEmail(token);
+            logger.info("[JwtFilter] Extracted Email: " + email);
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            logger.info("[JwtFilter] Loaded UserDetails: " + userDetails.getUsername());
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            logger.info("[JwtFilter] SecurityContext에 인증 객체 설정 완료");
+        } else {
+            logger.warn("[JwtFilter] 유효하지 않거나 누락된 토큰");
         }
 
         filterChain.doFilter(request, response);
-    }*/
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws java.io.IOException, jakarta.servlet.ServletException {
-
-        String header = req.getHeader("Authorization");
-        String token = (header != null && header.startsWith("Bearer "))
-                ? header.substring(7) : null;
-
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmail(token);
-            var userDetails = userDetailsService.loadUserByUsername(email);
-
-            var auth = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        chain.doFilter(req, res);
     }
 
     private String resolveToken(HttpServletRequest request) {
@@ -69,34 +65,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 }
 
-/*}
 
-    private final da_ni_ni.backend.user.jwt.JwtTokenProvider tokenProvider;
-    private final UserDetailsService userDetailsService;
-
-    public JwtAuthenticationFilter(da_ni_ni.backend.user.jwt.JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
-        this.tokenProvider = tokenProvider;
-        this.userDetailsService = userDetailsService;
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws java.io.IOException, jakarta.servlet.ServletException {
-
-        String header = req.getHeader("Authorization");
-        String token = (header != null && header.startsWith("Bearer "))
-                ? header.substring(7) : null;
-
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            String email = tokenProvider.getEmail(token);
-            var userDetails = userDetailsService.loadUserByUsername(email);
-
-            var auth = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        chain.doFilter(req, res);
-    }
-}*/

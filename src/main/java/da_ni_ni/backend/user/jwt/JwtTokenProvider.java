@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -12,17 +14,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
+
+
     public JwtTokenProvider(JwtTokenProperties properties) {
-        byte[] keyBytes = Base64.getUrlDecoder().decode(properties.getSecret());
+        byte[] keyBytes = Base64.getDecoder().decode(properties.getSecret());
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.expirationMs = properties.getExpirationMs();
+
+        log.info("토큰 만료 시간 설정 값: {}", this.expirationMs);
     }
 
     private final Key key;
@@ -33,6 +42,8 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().setSubject(username);
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
+
+        log.info("토큰 만료 시간: {}", expiry);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -48,7 +59,7 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-    }
+        }
 
     public Authentication getAuthentication(String token) {
         String email = getEmail(token);
@@ -65,10 +76,13 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);  // JWT 파싱
             return true;
         } catch (Exception e) {
+            log.warn("[JwtTokenProvider] 토큰 검증 실패: " + e.getMessage());
             return false;
         }
     }
 
+    public void init() {
+    }
 }
 /*{
 

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 // 가입 요청
 @Entity
-@Getter
+@Getter @Setter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
