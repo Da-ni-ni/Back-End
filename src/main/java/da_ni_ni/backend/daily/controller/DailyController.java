@@ -61,6 +61,18 @@ public class DailyController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 댓글 수정
+    @PutMapping("/{dailyId}/comments/{commentId}")
+    public ResponseEntity<ResponseDto> updateDailyComment(
+            @PathVariable("dailyId") Long dailyId,
+            @PathVariable("commentId") Long commentId,
+            @RequestBody UpdateCommentRequest request) {
+        log.info("Request to PUT comment");
+        Long userId = authService.getCurrentUser().getId();
+        UpdateCommentResponse response = dailyService.updateComment(request, dailyId, commentId, userId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     // 댓글 삭제
     @DeleteMapping("/{dailyId}/comments/{commentId}")
     public ResponseEntity<ResponseDto> deleteDailyComment(
