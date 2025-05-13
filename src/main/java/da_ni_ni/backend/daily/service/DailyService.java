@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,13 +49,13 @@ public class DailyService {
 
     // 게시글로 댓글 조회
     public List<Comment> findCommentAllByDailyId(Long dailyId) {
-        Daily daily = findById(dailyId);
-        List<Comment> dailyComments = commentRepository.findAllByDaily(daily);
-        if (dailyComments.isEmpty()) {
-            throw new CommentNotFoundException(dailyId);
+        List<Comment> comments = commentRepository.findAllByDailyId(dailyId);
+        if (comments == null) {
+            return Collections.emptyList(); // 빈 리스트 반환
         }
-        return dailyComments;
+        return comments;
     }
+
 
     // 멤버로 댓글 조회
     public List<Comment> findCommentByMember(final User user) {
@@ -69,10 +70,7 @@ public class DailyService {
     public List<DailyLike> findLikeAllByDailyId(final Long dailyId) {
         Daily daily = findById(dailyId);
         List<DailyLike> dailyDailyLikes = likeRepository.findAllByDaily(daily);
-        if (dailyDailyLikes.isEmpty()) {
-            throw new LikeNotFoundException(dailyId);
-        }
-        return dailyDailyLikes;
+        return dailyDailyLikes != null ? dailyDailyLikes : Collections.emptyList(); // null일 경우 빈 리스트 반환
     }
 
 
@@ -88,6 +86,7 @@ public class DailyService {
                 .date(LocalDate.now())
                 .user(user)
                 .content(request.getContent())
+                .familyGroup(user.getFamilyGroup())
                 .build();
         dailyRepository.save(daily);
         return CreateDailyResponse.createWith(daily);
@@ -117,13 +116,18 @@ public class DailyService {
         if (!daily.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("본인의 게시글만 삭제할 수 있습니다.");
         }
-        // 게시글에 달린 댓글 삭제
-        List<Comment> comments = findCommentAllByDailyId(dailyId);
-        commentRepository.deleteAll(comments);
 
-        // 게시글에 달린 좋아요 삭제
+        // 게시글에 달린 댓글 삭제 (없어도 상관 없음)
+        List<Comment> comments = findCommentAllByDailyId(dailyId);
+        if (comments != null && !comments.isEmpty()) {
+            commentRepository.deleteAll(comments);
+        }
+
+        // 게시글에 달린 좋아요 삭제 (없어도 상관 없음)
         List<DailyLike> dailyLikes = findLikeAllByDailyId(dailyId);
-        likeRepository.deleteAll(dailyLikes);
+        if (dailyLikes != null && !dailyLikes.isEmpty()) {
+            likeRepository.deleteAll(dailyLikes);
+        }
 
         // 게시글 삭제
         dailyRepository.delete(daily);
@@ -138,6 +142,7 @@ public class DailyService {
                 .orElseThrow(DailyNotFoundException::new);
         Comment comment = Comment.builder()
                 .user(user)
+                .daily(daily)
                 .content(request.getContent())
                 .build();
         commentRepository.save(comment);
@@ -233,10 +238,12 @@ public class DailyService {
     // 게시글 상세 조회
     @Transactional(readOnly = true)
     public FindDailyDetailResponse getDailyDetail(Long dailyId) {
-        Daily daily = findById(dailyId);
-        List<Comment> comments = commentRepository.findAllByDaily(daily);
-        List<String> commentContents = comments.stream()
-                .map(comment -> "[" + comment.getUser().getNickName() + "]" + comment.getContent())
+        Daily daily = dailyRepository.findById(dailyId)
+                .orElseThrow(DailyNotFoundException::new);
+
+        List<Comment> comments = commentRepository.findAllByDailyId(dailyId);
+        List<CommentDetailData> commentContents = comments.stream()
+                .map(CommentDetailData::from)
                 .collect(Collectors.toList());
         return FindDailyDetailResponse.createWith(daily, commentContents);
     }
@@ -250,7 +257,7 @@ public class DailyService {
         LocalDate startDate = now.with(DayOfWeek.MONDAY);
         LocalDate endDate = startDate.plusDays(6);
 
-        List<Daily> dailies = dailyRepository.findAllByGroupAndDateBetween(user.getFamilyGroup(), startDate, endDate);
+        List<Daily> dailies = dailyRepository.findAllByFamilyGroupIdAndDateBetween(user.getFamilyGroup().getId(), startDate, endDate);
 
         List<DailySimpleData> dailyList = dailies.stream()
                 .map(daily -> {

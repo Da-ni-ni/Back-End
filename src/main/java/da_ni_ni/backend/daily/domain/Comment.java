@@ -1,5 +1,6 @@
 package da_ni_ni.backend.daily.domain;
 
+import da_ni_ni.backend.common.BaseTime;
 import da_ni_ni.backend.daily.dto.UpdateCommentData;
 import da_ni_ni.backend.user.domain.User;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
+public class Comment extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +21,6 @@ public class Comment {
     private Long commentId;
 
     private String content;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_id")
@@ -34,6 +32,7 @@ public class Comment {
 
     public void updateComment(UpdateCommentData data) {
         this.content = data.getContent();
+
     }
 
 }

@@ -58,7 +58,6 @@ public class GroupService {
                 .familyGroup(familyGroup)
                 .inviteCode(request.getInviteCode())
                 .status(JoinReq.RequestStatus.PENDING)
-                .createdAt(LocalDateTime.now())
                 .build();
         joinRequestRepository.save(joinReq);
 
@@ -111,7 +110,6 @@ public class GroupService {
         // 요청 수락
         if (request.getStatus() == JoinReq.RequestStatus.APPROVED) {
             targetRequest.setStatus(JoinReq.RequestStatus.APPROVED); // 상태 업데이트
-            targetRequest.setUpdatedAt(LocalDateTime.now());
             familyGroup.addUser(targetRequest.getUser()); // 그룹에 요청 유저 추가
             // joinRequestRepository.delete(targetRequest); // 요청 목록에서 처리 완료된 요청 삭제
         }

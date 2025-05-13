@@ -11,6 +11,5 @@ import java.time.LocalDate;
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateCommentRequest {
-    private LocalDate date;
     private String content;
 }

@@ -30,6 +30,7 @@ public class UserService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .nickName(request.getName())
                 .build();
 
         userRepository.save(user);

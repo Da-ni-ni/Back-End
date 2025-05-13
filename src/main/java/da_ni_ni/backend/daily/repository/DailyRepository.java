@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface DailyRepository extends JpaRepository<Daily, Long> {
     List<Daily> findDailyByUser(User user);
-    List<Daily> findAllByGroupAndDateBetween(FamilyGroup familyGroup, LocalDate startDate, LocalDate endDate);
+    List<Daily> findAllByFamilyGroupIdAndDateBetween(Long familyGroupId, LocalDate startDate, LocalDate endDate);
 }
 
 
