@@ -1,5 +1,6 @@
 package da_ni_ni.backend.group.domain;
 
+import da_ni_ni.backend.common.BaseTime;
 import da_ni_ni.backend.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JoinReq {
+public class JoinReq extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "request_id")
@@ -32,9 +33,6 @@ public class JoinReq {
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     public enum RequestStatus {
         PENDING,

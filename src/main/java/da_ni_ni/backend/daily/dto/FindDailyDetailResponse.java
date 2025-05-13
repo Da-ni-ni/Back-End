@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -16,17 +17,17 @@ import java.util.List;
 public class FindDailyDetailResponse implements ResponseDto {
     private Long dailyId;
     private LocalDate date;
-    private String name;
+    private String authorName;
     private String content;
     private long likeCount;
     private long commentCount;
-    private List<String> comments;
+    private List<CommentDetailData> comments;
 
-    public static FindDailyDetailResponse createWith(Daily daily, List<String> comments) {
+    public static FindDailyDetailResponse createWith(Daily daily, List<CommentDetailData> comments) {
         return FindDailyDetailResponse.builder()
                 .dailyId(daily.getId())
                 .date(daily.getDate())
-                .name(daily.getUser().getNickName())
+                .authorName(daily.getUser().getNickName())
                 .content(daily.getContent())
                 .likeCount(daily.getLikeCount())
                 .commentCount(daily.getCommentCount())

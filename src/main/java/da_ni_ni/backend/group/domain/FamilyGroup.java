@@ -1,5 +1,6 @@
 package da_ni_ni.backend.group.domain;
 
+import da_ni_ni.backend.common.BaseTime;
 import da_ni_ni.backend.group.dto.UpdateGroupNameData;
 import da_ni_ni.backend.user.domain.User;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import java.util.Random;
 @Getter @Builder @Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FamilyGroup {
+public class FamilyGroup extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +31,6 @@ public class FamilyGroup {
 
     @OneToMany(mappedBy = "familyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<User> users = new ArrayList<>();
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     public void updateName(UpdateGroupNameData data) {
         this.name = data.getNewName();
@@ -58,7 +56,6 @@ public class FamilyGroup {
                 .name(name)
                 .adminUser(adminUser)
                 .inviteCode(generateRandomCode())
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 
