@@ -2,7 +2,7 @@ package da_ni_ni.backend.group.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import da_ni_ni.backend.global.dto.ResponseDto;
+import da_ni_ni.backend.common.ResponseDto;
 import da_ni_ni.backend.group.domain.FamilyGroup;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class UpdateGroupNameResponse implements ResponseDto {
         return UpdateGroupNameResponse.builder()
                 .groupId(familyGroup.getId())
                 .groupName(familyGroup.getName())
-                .updatedAt(familyGroup.getUpdatedAt())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }

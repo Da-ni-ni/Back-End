@@ -1,4 +1,4 @@
-package da_ni_ni.backend.global.dto;
+package da_ni_ni.backend.common;
 
 import lombok.Builder;
 import lombok.Getter;

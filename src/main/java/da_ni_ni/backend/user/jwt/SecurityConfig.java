@@ -2,6 +2,7 @@ package da_ni_ni.backend.user.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import da_ni_ni.backend.user.dto.ErrorResponseDto;
+import da_ni_ni.backend.user.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,13 +25,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Autowired
     public SecurityConfig(
             JwtTokenProvider jwtTokenProvider,
-            UserDetailsService userDetailsService,
+            CustomUserDetailsService userDetailsService,
             AuthenticationConfiguration authenticationConfiguration
     ) {
         this.jwtTokenProvider = jwtTokenProvider;

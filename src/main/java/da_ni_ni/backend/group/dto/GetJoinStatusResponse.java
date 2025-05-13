@@ -2,7 +2,7 @@ package da_ni_ni.backend.group.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import da_ni_ni.backend.global.dto.ResponseDto;
+import da_ni_ni.backend.common.ResponseDto;
 import da_ni_ni.backend.group.domain.JoinReq;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +24,7 @@ public class GetJoinStatusResponse implements ResponseDto {
     public static GetJoinStatusResponse createWith(JoinReq join) {
         return GetJoinStatusResponse.builder()
                 .requestId(join.getId())
-                .userName(join.getUser().getNickName())
+                .userName(join.getUser().getName())
                 .status(join.getStatus())
                 .createdAt(join.getCreatedAt())
                 .build();

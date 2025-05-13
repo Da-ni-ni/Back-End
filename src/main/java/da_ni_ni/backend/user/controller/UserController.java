@@ -1,3 +1,4 @@
+
 package da_ni_ni.backend.user.controller;
 
 import da_ni_ni.backend.user.dto.EmailCheckRequestDto;

@@ -9,5 +9,4 @@ public class LoginResponseDto {
     private String name;
     private String email;
     private String token;
-    private Long groupId;     // 가입된 그룹이 없으면 null
 }

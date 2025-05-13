@@ -32,4 +32,3 @@ public class JwtTokenProperties {
         this.expirationMs = expirationMs;
     }
 }
-
