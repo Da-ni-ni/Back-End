@@ -4,17 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
 public class UpdateCommentData {
-    private LocalDate date;
     private String content;
 
 
     public static UpdateCommentData createWith(UpdateCommentRequest request) {
         return UpdateCommentData.builder()
-                .date(request.getDate())
                 .content(request.getContent())
                 .build();
     }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findAllByDaily(Daily daily);
+    List<Comment> findAllByDailyId(Long dailyId);
     Optional<Comment> findCommentByCommentId(Long commentId);
     List<Comment> findByUser(User user);
     long countByDaily(Daily daily);

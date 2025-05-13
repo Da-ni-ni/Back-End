@@ -6,13 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 
 
 @Getter
 @Builder
 @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class UpdateCommentRequest {
-    private LocalDate date;
     private String content;
 }

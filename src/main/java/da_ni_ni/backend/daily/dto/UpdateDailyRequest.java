@@ -11,6 +11,5 @@ import java.time.LocalDate;
 @Builder
 @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class UpdateDailyRequest {
-    private LocalDate date;
     private String content;
 }
