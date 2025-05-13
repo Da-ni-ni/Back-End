@@ -21,7 +21,7 @@ public class UpdateGroupNameResponse implements ResponseDto {
         return UpdateGroupNameResponse.builder()
                 .groupId(familyGroup.getId())
                 .groupName(familyGroup.getName())
-                .updatedAt(familyGroup.getUpdatedAt())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }

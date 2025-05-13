@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface EmotionRepository extends JpaRepository<Emotion, Long> {
     Optional<Emotion>findById(Long emotionId);
-    Optional<Emotion>findByUserAndDate(User user, LocalDate date);
+    Optional<Emotion>findByUser(User user);
     List<Emotion>findAllByGroupId(Long groupId);
 }

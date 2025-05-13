@@ -11,5 +11,5 @@ import lombok.Setter;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateEmotionRequest {
     private String nickName; // Null 값 가능 (초기값 유지)
-    private EmotionType emotion;
+    private EmotionType emotionType;
 }

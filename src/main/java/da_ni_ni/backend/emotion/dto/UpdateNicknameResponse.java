@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateNicknameResponse implements ResponseDto {
-    private Long userId;
+    private Long emotionId;
     private String nickName;
     private LocalDateTime updatedAt;
 
     public static UpdateNicknameResponse createWith(Emotion emotion) {
         return UpdateNicknameResponse.builder()
-                .userId(emotion.getUser().getId())
+                .emotionId(emotion.getUser().getId())
                 .nickName(emotion.getUser().getNickName())
                 .updatedAt(emotion.getUpdatedAt())
                 .build();
