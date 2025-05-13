@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface EmotionRepository extends JpaRepository<Emotion, Long> {
     Optional<Emotion>findById(Long emotionId);
     Optional<Emotion>findByUser(User user);
-    List<Emotion>findAllByGroupId(Long groupId);
+    List<Emotion>findAllByUser_FamilyGroupId(Long groupId);
 }
