@@ -35,10 +35,19 @@ public class EmotionService {
         if (user.getFamilyGroup() == null) {
             throw new GroupNotFoundException();  // 그룹이 없을 경우 예외 처리
         }
+
+        // 이미 감정을 가진 경우 예외 처리
+        if (user.getEmotion() != null) {
+            throw new IllegalStateException("이미 감정이 등록되어 있습니다. 수정만 가능합니다.");
+        }
+
         Emotion emotion = Emotion.builder()
                 .user(user)
                 .emotionType(request.getEmotionType())
+                .group(user.getFamilyGroup())
                 .build();
+
+        user.setEmotion(emotion);
         emotionRepository.save(emotion);
         return CreateEmotionResponse.createWith(emotion);
     }
@@ -47,6 +56,12 @@ public class EmotionService {
     public UpdateEmotionResponse updateEmotionResponse(UpdateEmotionRequest request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
+        // 감정 정보가 없는 경우 예외 처리
+        Emotion userEmotion = user.getEmotion();
+        if (userEmotion == null) {
+            throw new EmotionNotFoundException();  // 혹은 다른 적절한 예외
+        }
+
         Emotion emotion = emotionRepository.findById(user.getEmotion().getId())
                 .orElseThrow(EmotionNotFoundException::new);
         // 본인의 감정만 수정 가능
@@ -75,7 +90,7 @@ public class EmotionService {
 
     // 가족 전체 감정 조회
     public FindTotalEmotionsResponse getGroupEmotions(Long groupId) {
-        List<Emotion> emotions = emotionRepository.findAllByGroupId(groupId);
+        List<Emotion> emotions = emotionRepository.findAllByUser_FamilyGroupId(groupId);
 
         List<FindEmotionDetailResponse> emotionList = emotions.stream()
                 .map(FindEmotionDetailResponse::createWith)
