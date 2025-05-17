@@ -8,15 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Date;
 
@@ -25,9 +21,10 @@ public class JwtTokenProvider {
 
     private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-
+    // 생성자에 UserDetailsService도 함께 주입
     public JwtTokenProvider(JwtTokenProperties properties) {
-        byte[] keyBytes = Base64.getDecoder().decode(properties.getSecret());
+        // URL-safe Base64 디코더 사용
+        byte[] keyBytes = Base64.getUrlDecoder().decode(properties.getSecret());
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.expirationMs = properties.getExpirationMs();
 

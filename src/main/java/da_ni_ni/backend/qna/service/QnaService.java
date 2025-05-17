@@ -55,35 +55,49 @@ public class QnaService {
                 .collect(Collectors.toList());
     }
 
-    /** 3) 문답 상세 조회 (내가 답변해야만 열람) */
     public QuestionDetailDto getQuestionDetail(Long questionId) {
-        // 1) 승인된 사용자 조회
         User me = authService.getApprovedUser();
 
-        // 2) 질문 존재 여부 먼저 검사 (ID 잘못됐으면 400)
+        // 1) 우선 질문 자체가 있는지 검사 (ID 오류 → 400)
         DailyQuestion q = questionRepo.findById(questionId)
                 .orElseThrow(() -> new BadRequestException("잘못된 질문 ID입니다."));
 
-        // 3) 내 답변이 있는지 확인 (없으면 403)
-        answerRepo.findByQuestionIdAndUserId(questionId, me.getId())
-                .orElseThrow(() -> new ForbiddenException(
-                        "답변을 등록해야 다른 가족의 답변을 볼 수 있습니다."
-                ));
+        // 2) 논리적 오늘 계산 (오전 5시 기준)
+        LocalDate logicalToday = getLogicalDate();
 
-        // 4) 이후 실제 상세 DTO 조립
+        // 3) 질문의 activationDate 가져오기
+        LocalDate activationDate = q.getActivationDate();
+
+        // 4) “오늘” 활성화된 질문일 경우에만 본인 답변 여부 검사
+        if (activationDate.equals(logicalToday)) {
+            boolean answered = answerRepo.findByQuestionIdAndUserId(questionId, me.getId())
+                    .isPresent();
+            if (!answered) {
+                throw new ForbiddenException(
+                        "당일 질문에 답변을 등록해야 다른 가족의 답변을 볼 수 있습니다."
+                );
+            }
+        }
+        // activationDate < logicalToday (즉, 과거 질문)이면 답변 여부와 무관하게 통과
+
+        // 5) 전체 가족의 답변 수집 (없는 사람은 “아직…” 텍스트)
         List<QuestionDetailDto.AnswerInfo> answers = authService.getFamilyMembers().stream()
-                .map(m -> {
-                    String ans = answerRepo.findByQuestionIdAndUserId(questionId, m.getId())
+                .map(member -> {
+                    String ans = answerRepo
+                            .findByQuestionIdAndUserId(questionId, member.getId())
                             .map(DailyAnswer::getAnswerText)
                             .orElse("아직 답변을 작성하지 않았습니다.");
                     return new QuestionDetailDto.AnswerInfo(
-                            m.getId(), m.getNickName(), ans
+                            member.getId(),
+                            member.getNickName(),
+                            ans
                     );
                 })
                 .collect(Collectors.toList());
 
+        // 6) DTO 반환
         return new QuestionDetailDto(
-                q.getCreatedAt().toLocalDate().toString(),
+                q.getActivationDate().toString(), // 보통 createdAt이 아닌 activationDate를 보여줘도 좋습니다
                 q.getId(),
                 q.getQuestion(),
                 answers
@@ -91,26 +105,35 @@ public class QnaService {
     }
 
 
-    /** 4) 답변 등록 */
+    // 4) 답변 등록
     @Transactional
     public String submitAnswer(Long questionId, AnswerRequestDto req) {
         User me = authService.getApprovedUser();
-        Long myId = me.getId();
+        LocalDate logicalToday = getLogicalDate();
 
+        // 1) 오늘 활성화된 질문인지
+        DailyQuestion activeQ = questionRepo.findByActivationDate(logicalToday)
+                .orElseThrow(() -> new BadRequestException("오늘 활성화된 질문이 없습니다."));
+        if (!activeQ.getId().equals(questionId)) {
+            throw new BadRequestException("오늘 활성화된 질문에만 답변할 수 있습니다.");
+        }
+
+        // 2) 중복 답변 검사
+        Long myId = me.getId();
         if (answerRepo.findByQuestionIdAndUserId(questionId, myId).isPresent()) {
             throw new BadRequestException("이미 답변을 등록했습니다.");
         }
-        DailyQuestion q = questionRepo.findById(questionId)
-                .orElseThrow(() -> new BadRequestException("질문이 없습니다."));
 
+        // 답변 저장
         DailyAnswer a = new DailyAnswer();
-        a.setQuestion(q);
+        a.setQuestion(activeQ);
         a.setUserId(myId);
         a.setAnswerText(req.getAnswer());
         answerRepo.save(a);
-
         return a.getCreatedAt().toString();
     }
+
+
 
     /** 5) 답변 수정 (당일 활성화된 질문에 대해서만) */
     @Transactional
