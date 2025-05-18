@@ -1,13 +1,14 @@
 package da_ni_ni.backend.common;
 
-import da_ni_ni.backend.qna.exception.ForbiddenException;
 import da_ni_ni.backend.qna.exception.BadRequestException;
+import da_ni_ni.backend.qna.exception.ForbiddenException;
 import da_ni_ni.backend.user.dto.ErrorResponseDto;
 import da_ni_ni.backend.user.exception.DuplicateEmailException;
 import da_ni_ni.backend.user.exception.LoginFailedException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,6 +31,20 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // 가장 첫 번째 검증 오류 메시지를 꺼내서 응답에 담습니다.
+        String errorMessage = ex.getBindingResult().getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .findFirst()
+                .orElse("잘못된 요청입니다.");
+        ErrorResponseDto body = new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.value(),
+                errorMessage
+        );
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
