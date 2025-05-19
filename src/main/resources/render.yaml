@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: Danini-backend
+    env: docker
+    plan: free
+    repo: https://github.com/Da-ni-ni/Back-End
+    region: singapore
+    branch: develop
+    buildCommand: ./gradlew build -x test
+    startCommand: java -jar build/libs/backend-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: JAVA_HOME
+        value: /opt/render/project/java
