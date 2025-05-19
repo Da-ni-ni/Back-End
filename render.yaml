@@ -6,7 +6,18 @@ services:
     repo: https://github.com/Da-ni-ni/Back-End
     region: singapore
     branch: develop
-    buildCommand: ./gradlew build -x test
+    dockerfilePath: ./Dockerfile
+
     envVars:
       - key: JAVA_HOME
         value: /opt/render/project/java
+      - key: DB_URL
+        value: jdbc:mysql://host.docker.internal:3306/your_db_name
+      - key: DB_USERNAME
+        value: your_db_username
+      - key: DB_PASSWORD
+        value: your_db_password
+      - key: JWT_SECRET
+        value: UEFQNDFSdWJSX2E4Mm1nVFd6U1NnZDg0UmNSM1NnX1FRU2Jzdm1kNFp4bw==
+      - key: JWT_EXPIRATION_MS
+        value: 3600000
