@@ -1,0 +1,30 @@
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: danini
+      MYSQL_USER: mooyou
+      MYSQL_PASSWORD: mooyouA2
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "3306:3306"
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: "UEFQNDFSdWJSX2E4Mm1nVFd6U1NnZDg0UmNSM1NnX1FRU2Jzdm1kNFp4bw=="
+      JWT_EXPIRATION_MS: 3600000
+      DB_URL: jdbc:mysql://db:3306/danini?serverTimezone=Asia/Seoul
+      DB_USERNAME: mooyou
+      DB_PASSWORD: mooyouA2
