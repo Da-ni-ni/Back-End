@@ -79,24 +79,16 @@ public class IntimacyService {
             throw new GroupNotFoundException();
         }
 
-        // 그룹 멤버 조회
         List<User> members = userRepo.findAllByFamilyGroup(group);
 
-        // 멤버별 최신 점수를 Optional로 가져와, 값이 있는 경우에만 점수 리스트에 수집
-        List<Integer> scores = members.stream()
-                .map(u -> scoreRepo.findFirstByUserOrderByTestDateDesc(u))
-                .filter(Optional::isPresent)
-                .map(opt -> opt.get().getScore())
-                .collect(Collectors.toList());
-
-        // 기록이 있는 사람 수로만 평균 계산
-        double avg = scores.isEmpty()
-                ? 0.0
-                : scores.stream()
-                .mapToInt(Integer::intValue)
+        double avg = members.stream()
+                .mapToInt(u -> scoreRepo.findFirstByUserOrderByTestDateDesc(u)
+                        .map(IntimacyScore::getScore)
+                        .orElse(0))
                 .average()
-                .getAsDouble();
+                .orElse(0.0);
 
         return new FamilyScoreResponse(group.getName(), avg);
     }
+
 }
