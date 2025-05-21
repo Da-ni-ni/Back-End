@@ -11,12 +11,14 @@ services:
     envVars:
       - key: JAVA_HOME
         value: /opt/render/project/java
+      - key: DB_DRIVER
+        value: org.postgresql.Driver
       - key: DB_URL
-        value: jdbc:mysql://localhost:3306/danini_db?serverTimezone=Asia/Seoul
+        value: jdbc:postgresql://dpg-d0msieh5pdvs739o9ub0-a.singapore-postgres.render.com:5432/danini
       - key: DB_USERNAME
-        value: mooyou
+        value: danini_user
       - key: DB_PASSWORD
-        value: mooyouA2
+        value: UbHBOyeX1ngKDIKqVGbb8RwCMwA4kjF6
       - key: JWT_SECRET
         value: UEFQNDFSdWJSX2E4Mm1nVFd6U1NnZDg0UmNSM1NnX1FRU2Jzdm1kNFp4bw==
       - key: JWT_EXPIRATION_MS
