@@ -1,11 +1,7 @@
-
 package da_ni_ni.backend.user.controller;
 
-import da_ni_ni.backend.user.dto.EmailCheckRequestDto;
-import da_ni_ni.backend.user.dto.EmailCheckResponseDto;
-import da_ni_ni.backend.user.dto.LoginRequestDto;
-import da_ni_ni.backend.user.dto.LoginResponseDto;
-import da_ni_ni.backend.user.dto.SignupRequestDto;
+import da_ni_ni.backend.user.dto.*;
+import da_ni_ni.backend.user.service.AuthService;
 import da_ni_ni.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -39,14 +36,18 @@ public class UserController {
         return ResponseEntity.ok(new EmailCheckResponseDto(exists));
     }
 
-    // 예시) 현재 사용자 조회
-    /*
-    @GetMapping("/me")
-    public UserResponseDto getCurrentUser(@AuthenticationPrincipal CustomUserDetails principal) {
-        return new UserResponseDto(
-                principal.getName(),
-                principal.getEmail(),
-                principal.getGroupId()
+    // 토큰 재발급
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenReissueResponseDto> reissueToken(@RequestBody TokenReissueRequestDto request) {
+        TokenReissueResponseDto response = userService.reissueToken(request);
+        return ResponseEntity.ok(response);
     }
-     */
+
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        String userEmail = authService.getCurrentUser().getEmail();
+        userService.logout(userEmail);
+        return ResponseEntity.ok().build();
+    }
 }
