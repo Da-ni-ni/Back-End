@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -64,7 +63,7 @@ public class SecurityConfig {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             ErrorResponseDto body = new ErrorResponseDto(
                     HttpStatus.UNAUTHORIZED.value(),
-                    authException.getMessage()
+                    "인증이 필요합니다. 토큰이 만료되었거나 유효하지 않습니다."
             );
             response.getWriter().write(objectMapper.writeValueAsString(body));
         };
@@ -91,7 +90,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/users/signup",
                                 "/api/v1/users/login",
-                                "/api/v1/users/check-email"
+                                "/api/v1/users/check-email",
+                                "/api/v1/users/reissue"  // 토큰 재발급은 인증 없이 접근 가능
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
