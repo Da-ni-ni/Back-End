@@ -1,13 +1,12 @@
 package da_ni_ni.backend.user.service;
 
+import da_ni_ni.backend.user.domain.RefreshToken;
 import da_ni_ni.backend.user.domain.User;
-import da_ni_ni.backend.user.dto.LoginRequestDto;
-import da_ni_ni.backend.user.dto.LoginResponseDto;
-import da_ni_ni.backend.user.dto.SignupRequestDto;
+import da_ni_ni.backend.user.dto.*;
 import da_ni_ni.backend.user.exception.DuplicateEmailException;
 import da_ni_ni.backend.user.exception.LoginFailedException;
-import da_ni_ni.backend.user.repository.UserRepository;
 import da_ni_ni.backend.user.jwt.JwtTokenProvider;
+import da_ni_ni.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     public void signup(SignupRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -36,7 +36,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponseDto login(LoginRequestDto req) {
         User user = userRepository.findByEmail(req.getEmail())
                 .orElseThrow(() -> new LoginFailedException("잘못된 이메일 또는 비밀번호입니다."));
@@ -45,16 +45,48 @@ public class UserService {
             throw new LoginFailedException("잘못된 이메일 또는 비밀번호입니다.");
         }
 
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        // Access Token과 Refresh Token 생성
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
 
         return new LoginResponseDto(
                 user.getName(),
                 user.getEmail(),
-                token
+                accessToken,
+                refreshToken.getToken()
         );
     }
 
     public boolean isEmailDuplicated(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    // 토큰 재발급 메서드
+    @Transactional
+    public TokenReissueResponseDto reissueToken(TokenReissueRequestDto request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+//        // 테스트용 만료된 토큰 특수 처리
+//        if ("expired-refresh-token".equals(requestRefreshToken)) {
+//            throw new ExpiredRefreshTokenException("Refresh token이 만료되었습니다. 다시 로그인해주세요.");
+//        }
+
+        // 기존 코드
+        RefreshToken refreshToken = refreshTokenService.findByTokenOrThrow(requestRefreshToken);
+        refreshTokenService.verifyExpiration(refreshToken);
+
+        // 새로운 토큰들 생성
+        String userEmail = refreshToken.getUserEmail();
+        String newAccessToken = jwtTokenProvider.createAccessToken(userEmail);
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(userEmail);
+
+        return new TokenReissueResponseDto(newAccessToken, newRefreshToken.getToken());
+    }
+
+
+    // 로그아웃 시 refresh token 삭제
+    @Transactional
+    public void logout(String userEmail) {
+        refreshTokenService.deleteByUserEmail(userEmail);
     }
 }

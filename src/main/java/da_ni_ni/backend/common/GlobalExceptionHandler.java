@@ -4,6 +4,8 @@ import da_ni_ni.backend.qna.exception.BadRequestException;
 import da_ni_ni.backend.qna.exception.ForbiddenException;
 import da_ni_ni.backend.user.dto.ErrorResponseDto;
 import da_ni_ni.backend.user.exception.DuplicateEmailException;
+import da_ni_ni.backend.user.exception.ExpiredRefreshTokenException;
+import da_ni_ni.backend.user.exception.InvalidRefreshTokenException;
 import da_ni_ni.backend.user.exception.LoginFailedException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -73,4 +75,21 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)  // 401 대신 400으로 변경
+                .body(new ErrorResponseDto(400, ex.getMessage()));  // 상태 코드와 메시지 모두 전달
+    }
+
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public ResponseEntity<ErrorResponseDto> handleExpiredRefreshToken(ExpiredRefreshTokenException e) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.value(),  // 400 코드로 설정
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);  // 400 상태로 반환
+    }
+
 }
