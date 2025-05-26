@@ -1,7 +1,9 @@
 package da_ni_ni.backend.qna.domain;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "ANSWERS")
@@ -29,12 +31,14 @@ public class DailyAnswer {
 
     @PrePersist
     public void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(ZoneId.of("Asia/Seoul")
+        );
     }
 
     @PreUpdate
     public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul")
+        );
     }
 
     public Long getId() {
