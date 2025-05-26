@@ -52,6 +52,10 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.5.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	// H2 데이터베이스 의존성 추가
+	testImplementation 'com.h2database:h2'
+	// H2를 testRuntimeOnly로 변경
+	testRuntimeOnly 'com.h2database:h2'
 
 }
 

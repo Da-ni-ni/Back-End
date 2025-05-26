@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+
 public class AuthService {
     private final UserRepository userRepo;
 

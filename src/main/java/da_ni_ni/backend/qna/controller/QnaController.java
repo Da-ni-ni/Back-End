@@ -28,7 +28,7 @@ public class QnaController {
     @GetMapping("/everyday")
     public ResponseEntity<QuestionResponseDto> getTodayQuestion() {
         DailyQuestionDto dto = qnaService.getTodayQuestion();
-        return ResponseEntity.ok(new QuestionResponseDto(dto.dailyQuestion()));
+        return ResponseEntity.ok(new QuestionResponseDto(dto.dailyId(), dto.dailyQuestion()));
     }
 
     /** 2) 월간 질문 조회 */
@@ -109,7 +109,11 @@ public class QnaController {
 
     // —— DTOs for controller responses —— //
 
-    public record QuestionResponseDto(String question) {}
+    // 수정할 코드:
+    public record QuestionResponseDto(
+            @JsonProperty("question_id") Long questionId,
+            String question
+    ) {}
 
     public record MonthlyQuestionResponseDto(
             @JsonProperty("question_id") Long questionId,

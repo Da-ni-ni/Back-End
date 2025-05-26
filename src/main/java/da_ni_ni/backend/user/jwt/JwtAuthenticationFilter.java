@@ -6,12 +6,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -30,6 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        // 이미 인증된 상태인지 확인
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            logger.info("[JwtFilter] 이미 인증된 상태, 추가 인증 처리 건너뜀");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = resolveToken(request);
         logger.info("[JwtFilter] Authorization Header: " + request.getHeader("Authorization"));

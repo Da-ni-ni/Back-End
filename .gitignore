@@ -8,7 +8,7 @@ build/
 ### STS ###
 .apt_generated
 .classpath
-.factorypath
+.factorypat
 .project
 .settings
 .springBeans
@@ -49,3 +49,4 @@ replay_pid*.log
 
 
 
+/src/main/resources/application-local.yml
