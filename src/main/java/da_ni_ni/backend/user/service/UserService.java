@@ -1,5 +1,6 @@
 package da_ni_ni.backend.user.service;
 
+import da_ni_ni.backend.intimacy.repository.IntimacyScoreRepository;
 import da_ni_ni.backend.user.domain.RefreshToken;
 import da_ni_ni.backend.user.domain.User;
 import da_ni_ni.backend.user.dto.*;
@@ -20,6 +21,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final IntimacyScoreRepository intimacyScoreRepository;
 
     public void signup(SignupRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -49,12 +51,23 @@ public class UserService {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
 
-        return new LoginResponseDto(
-                user.getName(),
-                user.getEmail(),
-                accessToken,
-                refreshToken.getToken()
-        );
+        // 가족 그룹 ID 가져오기 (없으면 null)
+        Long familyGroupId = null;
+        if (user.getFamilyGroup() != null) {
+            familyGroupId = user.getFamilyGroup().getId();
+        }
+
+        // 친밀도 검사 결과 존재 여부 확인 - 수정된 부분
+        boolean hasIntimacyTest = intimacyScoreRepository.findFirstByUserOrderByTestDateDesc(user).isPresent();
+
+        return LoginResponseDto.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .token(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .familyGroupId(familyGroupId)
+                .hasIntimacyTest(hasIntimacyTest)
+                .build();
     }
 
     public boolean isEmailDuplicated(String email) {
