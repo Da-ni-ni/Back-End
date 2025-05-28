@@ -67,13 +67,4 @@ public class GroupController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // 그룹명 수정
-    @PutMapping
-    private ResponseEntity<ResponseDto> updateGroupName (
-            @RequestBody UpdateGroupNameRequest request) {
-        log.info("Request to PUT familyGroup name");
-        Long userId = authService.getCurrentUser().getId();
-        UpdateGroupNameResponse response = groupService.updateGroupName(userId, request);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
 }
