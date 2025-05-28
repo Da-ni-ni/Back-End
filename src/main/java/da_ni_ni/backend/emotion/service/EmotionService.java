@@ -4,6 +4,10 @@ import da_ni_ni.backend.emotion.domain.Emotion;
 import da_ni_ni.backend.emotion.dto.*;
 import da_ni_ni.backend.emotion.exception.EmotionNotFoundException;
 import da_ni_ni.backend.emotion.repository.EmotionRepository;
+import da_ni_ni.backend.group.domain.FamilyGroup;
+import da_ni_ni.backend.group.dto.UpdateGroupNameData;
+import da_ni_ni.backend.group.dto.UpdateGroupNameRequest;
+import da_ni_ni.backend.group.dto.UpdateGroupNameResponse;
 import da_ni_ni.backend.group.exception.GroupNotFoundException;
 import da_ni_ni.backend.group.repository.GroupRepository;
 import da_ni_ni.backend.user.domain.User;
@@ -96,7 +100,10 @@ public class EmotionService {
                 .map(FindEmotionDetailResponse::createWith)
                 .collect(Collectors.toList());
 
-        return FindTotalEmotionsResponse.createWith(emotionList);
+        FamilyGroup groupName = groupRepository.findById(groupId)
+                .orElseThrow(GroupNotFoundException::new);
+
+        return FindTotalEmotionsResponse.createWith(groupName, emotionList);
     }
 
     // 다른 구성원 닉네임 수정
@@ -113,6 +120,20 @@ public class EmotionService {
         }
         targetUser.updateNickname(nickName);
         return UpdateNicknameResponse.createWith(emotion);
+    }
+
+    // 가족명 수정 (O)
+    public UpdateGroupNameResponse updateGroupName(Long userId, UpdateGroupNameRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        FamilyGroup familyGroup = user.getFamilyGroup();
+        if (familyGroup == null) {
+            throw new GroupNotFoundException();
+        }
+        UpdateGroupNameData updateGroupNameData = UpdateGroupNameData.createWith(request);
+        familyGroup.updateName(updateGroupNameData);
+        groupRepository.save(familyGroup);
+        return UpdateGroupNameResponse.createWith(familyGroup);
     }
 
 }
