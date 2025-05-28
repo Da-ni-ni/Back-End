@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<FamilyGroup, Long> {
     boolean existsByAdminUser(User user);
+    Optional<FamilyGroup>findById(Long id);
     Optional<FamilyGroup>findByInviteCode(String inviteCode);
     Optional<FamilyGroup>findByAdminUser(User user);
 }

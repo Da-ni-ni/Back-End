@@ -3,6 +3,8 @@ package da_ni_ni.backend.emotion.controller;
 import da_ni_ni.backend.common.ResponseDto;
 import da_ni_ni.backend.emotion.dto.*;
 import da_ni_ni.backend.emotion.service.EmotionService;
+import da_ni_ni.backend.group.dto.UpdateGroupNameRequest;
+import da_ni_ni.backend.group.dto.UpdateGroupNameResponse;
 import da_ni_ni.backend.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +68,16 @@ public class EmotionController {
         log.info("Request to PUT update other member nickname");
         Long userId = authService.getCurrentUser().getId();
         UpdateNicknameResponse response = emotionService.updateOtherMemberNickname(request, emotionId, userId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 그룹명 수정
+    @PutMapping("/group/{groupId}/groupname")
+    private ResponseEntity<ResponseDto> updateGroupName (
+            @RequestBody UpdateGroupNameRequest request) {
+        log.info("Request to PUT familyGroup name");
+        Long userId = authService.getCurrentUser().getId();
+        UpdateGroupNameResponse response =emotionService.updateGroupName(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
