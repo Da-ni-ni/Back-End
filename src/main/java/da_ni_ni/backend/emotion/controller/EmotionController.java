@@ -72,7 +72,7 @@ public class EmotionController {
     }
 
     // 그룹명 수정
-    @PutMapping("/group/{groupId}/groupname")
+    @PutMapping("/group/{groupId}/groupName")
     private ResponseEntity<ResponseDto> updateGroupName (
             @RequestBody UpdateGroupNameRequest request) {
         log.info("Request to PUT familyGroup name");
