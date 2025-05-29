@@ -61,6 +61,7 @@ public class UserService {
         boolean hasIntimacyTest = intimacyScoreRepository.findFirstByUserOrderByTestDateDesc(user).isPresent();
 
         return LoginResponseDto.builder()
+                .userId(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .token(accessToken)
