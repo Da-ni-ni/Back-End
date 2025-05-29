@@ -76,4 +76,14 @@ public class GroupController {
         UpdateGroupNameResponse response = groupService.updateGroupName(userId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // 그룹 초대 코드 조회 (그룹 ID로 조회)
+    @GetMapping("/{groupId}/invite-code")
+    public ResponseEntity<ResponseDto> getInviteCode(
+            @PathVariable Long groupId) {
+        log.info("Request to GET invite code for group: {}", groupId);
+        GetInviteCodeResponse response = groupService.getInviteCode(groupId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

@@ -4,8 +4,8 @@ import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.group.domain.JoinReq;
 import da_ni_ni.backend.group.dto.*;
 import da_ni_ni.backend.group.exception.*;
-import da_ni_ni.backend.group.repository.JoinRequestRepository;
 import da_ni_ni.backend.group.repository.GroupRepository;
+import da_ni_ni.backend.group.repository.JoinRequestRepository;
 import da_ni_ni.backend.user.domain.User;
 import da_ni_ni.backend.user.exception.UserNotFoundException;
 import da_ni_ni.backend.user.repository.UserRepository;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,5 +137,12 @@ public class GroupService {
         return UpdateGroupNameResponse.createWith(familyGroup);
     }
 
+    // 초대 코드 조회 (그룹 ID로 조회 - 누구나 가능)
+    public GetInviteCodeResponse getInviteCode(Long groupId) {
+        // 그룹 ID로 그룹 찾기
+        FamilyGroup familyGroup = groupRepository.findById(groupId)
+                .orElseThrow(GroupNotFoundException::new); // 인자 없는 생성자 사용
 
+        return GetInviteCodeResponse.createWith(familyGroup);
+    }
 }
