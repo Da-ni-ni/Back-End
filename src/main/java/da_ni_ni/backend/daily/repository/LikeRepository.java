@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface LikeRepository extends JpaRepository<DailyLike, Long> {
     List<DailyLike> findAllByDaily(Daily daily);
+    boolean existsByDailyAndUser(Daily daily, User user);
     Optional<DailyLike> findByDailyAndUser(Daily daily, User user);
     // daily와 연관된 DailyLike 개수 세기
     long countByDaily(Daily daily);
