@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +65,7 @@ public class IntimacyService {
 
     @Transactional(readOnly = true)
     public PersonalScoreResponse getPersonalScore(User me) {
-        IntimacyScore latest = scoreRepo.findFirstByUserOrderByTestDateDesc(me)
+        IntimacyScore latest = scoreRepo.findFirstByUserOrderByTestDateDescCreatedAtDesc(me)
                 .orElseThrow(IntimacyRecordNotFoundException::new);
         return new PersonalScoreResponse("나", latest.getScore());
     }
@@ -82,7 +80,7 @@ public class IntimacyService {
         List<User> members = userRepo.findAllByFamilyGroup(group);
 
         double avg = members.stream()
-                .mapToInt(u -> scoreRepo.findFirstByUserOrderByTestDateDesc(u)
+                .mapToInt(u -> scoreRepo.findFirstByUserOrderByTestDateDescCreatedAtDesc(u)
                         .map(IntimacyScore::getScore)
                         .orElse(0))
                 .average()
