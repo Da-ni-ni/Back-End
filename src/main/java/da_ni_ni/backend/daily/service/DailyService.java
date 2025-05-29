@@ -237,7 +237,9 @@ public class DailyService {
 
     // 게시글 상세 조회
     @Transactional(readOnly = true)
-    public FindDailyDetailResponse getDailyDetail(Long dailyId) {
+    public FindDailyDetailResponse getDailyDetail(Long dailyId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
         Daily daily = dailyRepository.findById(dailyId)
                 .orElseThrow(DailyNotFoundException::new);
 
@@ -245,7 +247,9 @@ public class DailyService {
         List<CommentDetailData> commentContents = comments.stream()
                 .map(CommentDetailData::from)
                 .collect(Collectors.toList());
-        return FindDailyDetailResponse.createWith(daily, commentContents);
+        boolean liked = likeRepository.existsByDailyAndUser(daily, user);
+
+        return FindDailyDetailResponse.createWith(daily, commentContents, liked);
     }
 
     // 주간 게시글 조회

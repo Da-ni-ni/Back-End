@@ -17,13 +17,21 @@ import java.time.LocalDateTime;
 @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class GetJoinStatusResponse implements ResponseDto {
     private Long requestId;
+    private Long groupId;
     private String userName;
     private JoinReq.RequestStatus status;
     private LocalDateTime createdAt;
 
     public static GetJoinStatusResponse createWith(JoinReq join) {
+        Long approvedGroupId = null;
+
+        if (join.getStatus() == JoinReq.RequestStatus.APPROVED) {
+            approvedGroupId = join.getFamilyGroup().getId();
+        }
+
         return GetJoinStatusResponse.builder()
                 .requestId(join.getId())
+                .groupId(approvedGroupId)
                 .userName(join.getUser().getName())
                 .status(join.getStatus())
                 .createdAt(join.getCreatedAt())

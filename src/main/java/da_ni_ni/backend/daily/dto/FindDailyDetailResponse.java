@@ -21,9 +21,11 @@ public class FindDailyDetailResponse implements ResponseDto {
     private String content;
     private long likeCount;
     private long commentCount;
+    private boolean liked;
     private List<CommentDetailData> comments;
 
-    public static FindDailyDetailResponse createWith(Daily daily, List<CommentDetailData> comments) {
+
+    public static FindDailyDetailResponse createWith(Daily daily, List<CommentDetailData> comments, boolean liked) {
         return FindDailyDetailResponse.builder()
                 .dailyId(daily.getId())
                 .date(daily.getDate())
@@ -31,6 +33,7 @@ public class FindDailyDetailResponse implements ResponseDto {
                 .content(daily.getContent())
                 .likeCount(daily.getLikeCount())
                 .commentCount(daily.getCommentCount())
+                .liked(liked)
                 .comments(comments)
                 .build();
 

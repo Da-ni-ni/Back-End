@@ -99,7 +99,7 @@ public class DailyController {
             @PathVariable("dailyId") Long dailyId) {
         log.info("Request to GET daily details");
         Long userId = authService.getCurrentUser().getId();
-        FindDailyDetailResponse response = dailyService.getDailyDetail(dailyId);
+        FindDailyDetailResponse response = dailyService.getDailyDetail(dailyId, userId);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
