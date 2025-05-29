@@ -83,6 +83,7 @@ public class DailyController {
         DeleteCommentResponse response = dailyService.deleteComment(dailyId, commentId, userId);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
     // 좋아요 토글
     @PostMapping("/{dailyId}")
     public ResponseEntity<ResponseDto> toggleLike(
