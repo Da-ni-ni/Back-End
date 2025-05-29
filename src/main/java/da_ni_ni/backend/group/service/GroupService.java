@@ -123,19 +123,6 @@ public class GroupService {
         return ApprovejoinResponse.createWith(targetRequest);
     }
 
-    // 가족명 수정 (O)
-    public UpdateGroupNameResponse updateGroupName(Long userId, UpdateGroupNameRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
-        FamilyGroup familyGroup = user.getFamilyGroup();
-        if (familyGroup == null) {
-            throw new GroupNotFoundException();
-        }
-        UpdateGroupNameData updateGroupNameData = UpdateGroupNameData.createWith(request);
-        familyGroup.updateName(updateGroupNameData);
-        groupRepository.save(familyGroup);
-        return UpdateGroupNameResponse.createWith(familyGroup);
-    }
 
     // 초대 코드 조회 (그룹 ID로 조회 - 누구나 가능)
     public GetInviteCodeResponse getInviteCode(Long groupId) {
