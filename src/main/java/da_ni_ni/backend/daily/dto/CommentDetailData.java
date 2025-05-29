@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CommentDetailData {
     private Long commentId;
+    private Long authorId;
     private String authorName;
     private String content;
     private LocalDateTime createdAt;
@@ -20,6 +21,7 @@ public class CommentDetailData {
     public static CommentDetailData from(Comment comment) {
         return new CommentDetailData(
                 comment.getCommentId(),
+                comment.getUser().getId(),
                 comment.getUser().getNickName() != null ? comment.getUser().getNickName() : comment.getUser().getName(),
                 comment.getContent() != null ? comment.getContent() : "내용 없음",
                 comment.getCreatedAt()
