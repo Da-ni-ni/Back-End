@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface IntimacyScoreRepository extends JpaRepository<IntimacyScore, Integer> {
-    Optional<IntimacyScore> findFirstByUserOrderByTestDateDesc(User user);
+    Optional<IntimacyScore> findFirstByUserOrderByTestDateDescCreatedAtDesc(User user);
 }
