@@ -17,6 +17,7 @@ import java.util.List;
 public class FindDailyDetailResponse implements ResponseDto {
     private Long dailyId;
     private LocalDate date;
+    private Long authorId;
     private String authorName;
     private String content;
     private long likeCount;
@@ -30,6 +31,7 @@ public class FindDailyDetailResponse implements ResponseDto {
                 .dailyId(daily.getId())
                 .date(daily.getDate())
                 .authorName(daily.getUser().getNickName())
+                .authorId(daily.getUser().getId())
                 .content(daily.getContent())
                 .likeCount(daily.getLikeCount())
                 .commentCount(daily.getCommentCount())
