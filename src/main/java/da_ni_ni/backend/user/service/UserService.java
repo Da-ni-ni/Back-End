@@ -58,7 +58,7 @@ public class UserService {
         }
 
         // 친밀도 검사 결과 존재 여부 확인 - 수정된 부분
-        boolean hasIntimacyTest = intimacyScoreRepository.findFirstByUserOrderByTestDateDesc(user).isPresent();
+        boolean hasIntimacyTest = intimacyScoreRepository.findFirstByUserOrderByTestDateDescCreatedAtDesc(user).isPresent();
 
         return LoginResponseDto.builder()
                 .userId(user.getId())
