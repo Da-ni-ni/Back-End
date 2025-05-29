@@ -81,12 +81,8 @@ public class GroupService {
 
         List<JoinReq> requests = joinRequestRepository.findAllByInviteCode(familyGroup.getInviteCode());
         List<GetJoinStatusResponse> list = requests.stream()
-                .map(req -> new GetJoinStatusResponse(
-                        req.getId(),
-                        req.getUser().getName(),
-                        req.getStatus(),
-                        req.getCreatedAt()
-                )).collect(Collectors.toList());
+                .map(GetJoinStatusResponse::createWith)
+                .collect(Collectors.toList());
 
         return new GetJoinStatusListResponse(list);
     }
