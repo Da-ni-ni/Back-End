@@ -122,7 +122,7 @@ public class EmotionService {
         return UpdateNicknameResponse.createWith(emotion);
     }
 
-    // 가족명 수정 (O)
+    // 그룹명 수정
     public UpdateGroupNameResponse updateGroupName(Long userId, UpdateGroupNameRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -135,7 +135,6 @@ public class EmotionService {
         groupRepository.save(familyGroup);
         return UpdateGroupNameResponse.createWith(familyGroup);
     }
-
 
 }
 
