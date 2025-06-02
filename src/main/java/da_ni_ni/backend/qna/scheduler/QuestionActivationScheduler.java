@@ -1,7 +1,9 @@
 package da_ni_ni.backend.qna.scheduler;
 
+import da_ni_ni.backend.Firebase.NotificationService;
 import da_ni_ni.backend.qna.repository.DailyQuestionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,10 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class QuestionActivationScheduler {
     private final DailyQuestionRepository questionRepo;
+    private final NotificationService notificationService;
+
 
     /**
      * 매일 오전 5시(서울 시간)에 호출.
@@ -33,5 +38,13 @@ public class QuestionActivationScheduler {
                     q.setActivationDate(today);
                     questionRepo.save(q);
                 });
+    }
+    /**
+     * 매일 오전 7시(서울 시간)에 호출.
+     * 오늘의 질문이 생성되었음을 알리는 푸시 알림 전송
+     */
+    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Seoul")
+    public void scheduleNewQuestionNotification() {
+        notificationService.sendNewDailyQuestionNotification();
     }
 }

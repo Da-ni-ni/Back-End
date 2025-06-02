@@ -6,15 +6,19 @@ import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.group.repository.GroupRepository;
 import da_ni_ni.backend.qna.domain.DailyAnswer;
 import da_ni_ni.backend.qna.domain.DailyQuestion;
+import da_ni_ni.backend.qna.repository.DailyQuestionRepository;
 import da_ni_ni.backend.user.domain.User;
 import da_ni_ni.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,6 +29,7 @@ public class NotificationService {
     private final FirebaseNotificationService firebaseNotificationService;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final DailyQuestionRepository dailyQuestionRepository;
 
     /**
      * 1. 내 Daily에 댓글이 달렸을 때 알림
@@ -159,5 +164,35 @@ public class NotificationService {
 
         // 알림 전송
         firebaseNotificationService.sendNotification(adminToken, title, body, data);
+    }
+    /**
+     * 5. 오늘의 새로운 질문이 생성되었을 때 알림
+     * 스케줄러에서 호출하기 위한 메서드
+     */
+    public void sendNewDailyQuestionNotification() {
+        try {
+            LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+            Optional<DailyQuestion> questionOpt = dailyQuestionRepository.findByActivationDate(today);
+
+            if (questionOpt.isEmpty()) {
+                log.warn("오늘({})의 질문이 없어 푸시 알림을 보낼 수 없습니다.", today);
+                return;
+            }
+
+            DailyQuestion todayQuestion = questionOpt.get();
+
+            String topic = "daily_question"; // 클라이언트가 구독해야 하는 토픽 이름
+            String title = "오늘의 질문이 도착했어요!";
+            String body = "새로운 가족 질문이 등록되었습니다. 여러분의 생각을 가족과 나눠보세요.";
+
+            Map<String, String> data = new HashMap<>();
+            data.put("questionId", todayQuestion.getId().toString());
+            data.put("type", "NEW_QUESTION");
+
+            String messageId = firebaseNotificationService.sendNotificationToTopic(topic, title, body, data);
+            log.info("오늘의 질문 알림 전송 완료: messageId={}, questionId={}", messageId, todayQuestion.getId());
+        } catch (Exception e) {
+            log.error("오늘의 질문 알림 전송 중 오류 발생", e);
+        }
     }
 }
