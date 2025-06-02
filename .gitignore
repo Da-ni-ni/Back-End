@@ -51,3 +51,4 @@ replay_pid*.log
 
 /src/main/resources/application-local.yml
 /src/main/resources/danini-firebase-service-account.json
+src/main/resources/danini-firebase-service-account.json
