@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -254,11 +255,11 @@ public class DailyService {
 
     // 주간 게시글 조회
     @Transactional(readOnly = true)
-    public FindWeekDailyResponse getWeeklyDailies (Long userId){
+    public FindWeekDailyResponse getWeeklyDailies (Long userId, LocalDate date){
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        LocalDate now = LocalDate.now();
-        LocalDate startDate = now.with(DayOfWeek.MONDAY);
+
+        LocalDate startDate = date.with(DayOfWeek.MONDAY);
         LocalDate endDate = startDate.plusDays(6);
 
         List<Daily> dailies = dailyRepository.findAllByFamilyGroupIdAndDateBetween(user.getFamilyGroup().getId(), startDate, endDate);
