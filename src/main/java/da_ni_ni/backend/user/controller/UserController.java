@@ -5,7 +5,9 @@ import da_ni_ni.backend.user.service.AuthService;
 import da_ni_ni.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -48,6 +50,13 @@ public class UserController {
     public ResponseEntity<Void> logout() {
         String userEmail = authService.getCurrentUser().getEmail();
         userService.logout(userEmail);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/fcm-token")
+    public ResponseEntity<Void> updateFcmToken(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody FcmTokenUpdateRequest request) {
+        userService.updateFcmToken(userDetails.getUsername(), request.getFcmToken());
         return ResponseEntity.ok().build();
     }
 }

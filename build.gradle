@@ -49,13 +49,27 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	// JUnit 5 + Mockito 의존성
-	testImplementation 'org.mockito:mockito-core:5.5.0'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.mockito:mockito-core:5.7.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+
+//	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+//	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+
 	// H2 데이터베이스 의존성 추가
 	testImplementation 'com.h2database:h2'
 	// H2를 testRuntimeOnly로 변경
 	testRuntimeOnly 'com.h2database:h2'
+
+	// Firebase Admin SDK
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+	// JSON 처리 라이브러리
+	implementation 'org.json:json:20230618'
+
+	// WebClient for HTTP calls
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 }
 
@@ -64,6 +78,7 @@ test {
 	// Optional: 로그 레벨 올리기
 	testLogging {
 		events "passed", "skipped", "failed"
+		exceptionFormat "full"
 	}
 }
 
@@ -72,3 +87,11 @@ tasks.named('test') {
 }
 
 
+//sourceSets {
+//	test {
+//		java {
+//			// 아래가 기본값이므로 보통 선언하지 않아도 됩니다.
+//			srcDirs = ['src/test/java']
+//		}
+//	}
+//}

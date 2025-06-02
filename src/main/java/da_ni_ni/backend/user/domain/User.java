@@ -3,7 +3,6 @@ package da_ni_ni.backend.user.domain;
 import da_ni_ni.backend.emotion.domain.Emotion;
 import da_ni_ni.backend.group.domain.FamilyGroup;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 //import da_ni_ni.backend.familyGroup.domain.Groups;
 
@@ -32,6 +31,10 @@ public class User {
 
     private String nickName;
 
+    // FCM 토큰 필드 추가
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "family_group_id")
     private FamilyGroup familyGroup;
@@ -42,5 +45,10 @@ public class User {
 
     public void updateNickname(String nickName) {
         this.nickName = nickName;
+    }
+
+    // FCM 토큰 업데이트 메서드
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

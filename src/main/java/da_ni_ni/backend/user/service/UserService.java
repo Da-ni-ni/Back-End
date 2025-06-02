@@ -103,4 +103,17 @@ public class UserService {
     public void logout(String userEmail) {
         refreshTokenService.deleteByUserEmail(userEmail);
     }
+
+    /**
+     * 사용자의 FCM 토큰 업데이트
+     */
+    @Transactional
+    public void updateFcmToken(String email, String fcmToken) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + email));
+
+        user.updateFcmToken(fcmToken);
+        userRepository.save(user);
+    }
+
 }
