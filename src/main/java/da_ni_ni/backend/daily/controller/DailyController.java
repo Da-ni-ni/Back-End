@@ -6,9 +6,12 @@ import da_ni_ni.backend.common.ResponseDto;
 import da_ni_ni.backend.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
@@ -106,10 +109,18 @@ public class DailyController {
 
     // 주간 게시글 조회
     @GetMapping
-    public ResponseEntity<ResponseDto> getWeeklyDailies() {
-        log.info("Request to GET weekly dailies");
+    public ResponseEntity<ResponseDto> getWeeklyDailies(
+            @RequestParam(value = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+        log.info("Request to GET weekly dailies with date: {}", date);
         Long userId = authService.getCurrentUser().getId();
-        FindWeekDailyResponse response = dailyService.getWeeklyDailies(userId);
+        // 기준일이 없으면 오늘 날짜 사용
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        FindWeekDailyResponse response = dailyService.getWeeklyDailies(userId, date);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
