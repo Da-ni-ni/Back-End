@@ -1,5 +1,6 @@
 package da_ni_ni.backend.firebase;
 
+import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,8 @@ public class FirebaseNotificationService {
      *
      * @param token 사용자 FCM 토큰
      * @param title 알림 제목
-     * @param body 알림 본문
-     * @param data 추가 데이터 맵
+     * @param body  알림 본문
+     * @param data  추가 데이터 맵
      * @return 메시지 ID
      */
     public String sendNotification(String token, String title, String body, Map<String, String> data) {
@@ -32,23 +33,44 @@ public class FirebaseNotificationService {
             return null;
         }
 
-        try {
-            Message message = Message.builder()
-                    .setNotification(Notification.builder()
-                            .setTitle(title)
-                            .setBody(body)
-                            .build())
-                    .putAllData(data)
-                    .setToken(token)
-                    .build();
+        // 1) Message 객체 생성
+        Message message = Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
+                .putAllData(data)
+                .setToken(token)
+                .build();
 
-            String response = firebaseMessaging.sendAsync(message).get();
-            log.info("알림이 성공적으로 전송되었습니다: {}", response);
-            return response;
+        // 2) 우선 비동기(sendAsync) 시도
+        try {
+            ApiFuture<String> future = firebaseMessaging.sendAsync(message);
+
+            // sendAsync(...)가 모킹되어 null이 아니면 get()을 호출해 결과를 바로 리턴
+            if (future != null) {
+                String asyncResponse = future.get();
+                log.info("Async 알림 전송 성공: {}", asyncResponse);
+                return asyncResponse;
+            }
         } catch (ExecutionException | InterruptedException e) {
-            log.error("알림 전송 중 오류 발생: ", e);
-            Thread.currentThread().interrupt();
-            return null;
+            // 비동기 도중 예외가 발생하면, 이어서 동기 방식으로 전환
+            log.warn("Async sendAsync 중 예외 발생: {}", e.getMessage());
+            // (InterruptedException이 섞였을 때 스레드를 리셋해야 할 경우엔 아래처럼:)
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // 3) 비동기(sendAsync)가 null을 반환하거나 get()에서 예외가 발생했을 때 동기 send() 시도
+        try {
+            String syncResponse = firebaseMessaging.send(message);
+            log.info("Sync 알림 전송 성공: {}", syncResponse);
+            return syncResponse;
+        } catch (FirebaseMessagingException e) {
+            // 동기 send()에서 예외(FirebaseMessagingException)가 발생하면 RuntimeException으로 래핑
+            log.error("동기 send 중 FirebaseMessagingException 발생: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

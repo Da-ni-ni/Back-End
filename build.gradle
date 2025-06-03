@@ -107,3 +107,8 @@ compileTestJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 }
+
+// Gradle
+configurations.all {
+	exclude group: 'commons-logging', module: 'commons-logging'
+}
