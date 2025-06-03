@@ -11,16 +11,25 @@ services:
     envVars:
       - key: JAVA_HOME
         value: /opt/render/project/java
-      - key: DB_DRIVER
+      - key: SPRING_DATASOURCE_DRIVER
         value: org.postgresql.Driver
-      - key: DB_URL
+      - key: SPRING_DATASOURCE_URL
         value: jdbc:postgresql://dpg-d0msieh5pdvs739o9ub0-a.singapore-postgres.render.com:5432/danini
-      - key: DB_USERNAME
+      - key: SPRING_DATASOURCE_USERNAME
         value: danini_user
-      - key: DB_PASSWORD
+      - key: SPRING_DATASOURCE_PASSWORD
         value: UbHBOyeX1ngKDIKqVGbb8RwCMwA4kjF6
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: 30
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: 10
+      - key: SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT
+        value: 600000
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: 1800000
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: 30000
       - key: JWT_SECRET
         value: UEFQNDFSdWJSX2E4Mm1nVFd6U1NnZDg0UmNSM1NnX1FRU2Jzdm1kNFp4bw==
       - key: JWT_EXPIRATION_MS
         value: 3600000
-
