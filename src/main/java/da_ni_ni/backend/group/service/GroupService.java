@@ -64,6 +64,7 @@ public class GroupService {
     }
 
     // 내 가입 요청 상태 조회
+    @Transactional(readOnly = true)
     public GetJoinStatusResponse getMyJoinStatus(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -73,6 +74,7 @@ public class GroupService {
     }
 
     // 가입 요청 목록 조회 (생성자만 확인 가능) (O)
+    @Transactional(readOnly = true)
     public GetJoinStatusListResponse getJoinRequestsList(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -121,6 +123,7 @@ public class GroupService {
 
 
     // 초대 코드 조회 (그룹 ID로 조회 - 누구나 가능)
+    @Transactional(readOnly = true)
     public GetInviteCodeResponse getInviteCode(Long groupId) {
         // 그룹 ID로 그룹 찾기
         FamilyGroup familyGroup = groupRepository.findById(groupId)
