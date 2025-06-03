@@ -48,6 +48,10 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// 테스트에도 Lombok을 사용한다면 아래도 추가하세요
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
 	// JUnit 5 + Mockito 의존성
 //	testImplementation 'org.mockito:mockito-core:5.7.0'
 //	testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
