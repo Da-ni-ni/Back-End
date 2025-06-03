@@ -1,7 +1,5 @@
-package da_ni_ni.backend.fcm;
+package da_ni_ni.backend.firebase;
 
-import da_ni_ni.backend.Firebase.FirebaseNotificationService;
-import da_ni_ni.backend.Firebase.NotificationService;
 import da_ni_ni.backend.group.domain.FamilyGroup;
 import da_ni_ni.backend.group.repository.GroupRepository;
 import da_ni_ni.backend.qna.domain.DailyAnswer;
@@ -9,9 +7,11 @@ import da_ni_ni.backend.qna.domain.DailyQuestion;
 import da_ni_ni.backend.user.domain.User;
 import da_ni_ni.backend.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,23 +22,24 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-class NotificationServiceTest {
+@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
+public class NotificationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private FirebaseNotificationService firebaseNotificationService;
 
-    @MockBean
+    @Mock
     private UserRepository userRepository;
 
-    @MockBean
+    @Mock
     private GroupRepository groupRepository;
 
     @Test
-    void testSendDailyAnswerNotification() {
+    public void testSendDailyAnswerNotification() {
         // 테스트 데이터 준비
         User user = User.builder()
                 .id(1L)

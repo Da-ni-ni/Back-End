@@ -49,12 +49,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	// JUnit 5 + Mockito 의존성
-	testImplementation 'org.mockito:mockito-core:5.7.0'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+//	testImplementation 'org.mockito:mockito-core:5.7.0'
+//	testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
+//	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 
-//	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-//	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+//	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+//	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 
 
 	// H2 데이터베이스 의존성 추가
@@ -87,11 +87,19 @@ tasks.named('test') {
 }
 
 
-//sourceSets {
-//	test {
-//		java {
-//			// 아래가 기본값이므로 보통 선언하지 않아도 됩니다.
-//			srcDirs = ['src/test/java']
-//		}
-//	}
-//}
+sourceSets {
+	test {
+		java {
+			srcDirs = ['src/test/java']
+		}
+		resources {
+			srcDirs = ['src/test/resources']
+		}
+	}
+}
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+}

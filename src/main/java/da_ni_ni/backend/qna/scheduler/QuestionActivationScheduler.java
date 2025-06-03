@@ -1,6 +1,6 @@
 package da_ni_ni.backend.qna.scheduler;
 
-import da_ni_ni.backend.Firebase.NotificationService;
+import da_ni_ni.backend.firebase.NotificationService;
 import da_ni_ni.backend.qna.repository.DailyQuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
