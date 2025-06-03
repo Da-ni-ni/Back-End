@@ -1,4 +1,4 @@
-package da_ni_ni.backend.Firebase;
+package da_ni_ni.backend.firebase;
 
 import da_ni_ni.backend.daily.domain.Comment;
 import da_ni_ni.backend.daily.domain.Daily;

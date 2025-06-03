@@ -1,4 +1,4 @@
-package da_ni_ni.backend.Firebase;
+package da_ni_ni.backend.firebase;
 
 import com.google.firebase.messaging.*;
 import lombok.RequiredArgsConstructor;
