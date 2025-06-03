@@ -81,6 +81,7 @@ public class EmotionService {
     }
 
     // 감정 상세 조회
+    @Transactional(readOnly = true)
     public FindEmotionDetailResponse getEmotionDetail(Long emotionId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -93,6 +94,7 @@ public class EmotionService {
     }
 
     // 가족 전체 감정 조회
+    @Transactional(readOnly = true)
     public FindTotalEmotionsResponse getGroupEmotions(Long groupId) {
         List<Emotion> emotions = emotionRepository.findAllByUser_FamilyGroupId(groupId);
 
