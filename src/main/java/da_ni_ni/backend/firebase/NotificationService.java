@@ -170,18 +170,20 @@ public class NotificationService {
      * 스케줄러에서 호출하기 위한 메서드
      */
     public void sendNewDailyQuestionNotification() {
+        log.info("[NotificationService.sendNewDailyQuestionNotification] 진입");
         try {
             LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            Optional<DailyQuestion> questionOpt = dailyQuestionRepository.findByActivationDate(today);
+            log.info("[NotificationService] 오늘 날짜: {}", today);
 
+            Optional<DailyQuestion> questionOpt = dailyQuestionRepository.findByActivationDate(today);
             if (questionOpt.isEmpty()) {
-                log.warn("오늘({})의 질문이 없어 푸시 알림을 보낼 수 없습니다.", today);
+                log.warn("[NotificationService] 오늘({})의 질문이 없어 푸시 알림을 보낼 수 없습니다.", today);
                 return;
             }
+            log.info("[NotificationService] 오늘의 질문을 조회했습니다. ID={}", questionOpt.get().getId());
 
             DailyQuestion todayQuestion = questionOpt.get();
-
-            String topic = "daily_question"; // 클라이언트가 구독해야 하는 토픽 이름
+            String topic = "daily_question";
             String title = "오늘의 질문이 도착했어요!";
             String body = "새로운 가족 질문이 등록되었습니다. 여러분의 생각을 가족과 나눠보세요.";
 
@@ -189,10 +191,11 @@ public class NotificationService {
             data.put("questionId", todayQuestion.getId().toString());
             data.put("type", "NEW_QUESTION");
 
+            log.info("[NotificationService] FCM 토픽 전송 전 → topic={}, title={}, body={}", topic, title, body);
             String messageId = firebaseNotificationService.sendNotificationToTopic(topic, title, body, data);
-            log.info("오늘의 질문 알림 전송 완료: messageId={}, questionId={}", messageId, todayQuestion.getId());
+            log.info("[NotificationService] FCM 전송 응답(messageId)={}", messageId);
         } catch (Exception e) {
-            log.error("오늘의 질문 알림 전송 중 오류 발생", e);
+            log.error("[NotificationService.sendNewDailyQuestionNotification] 예외 발생: ", e);
         }
     }
 }
