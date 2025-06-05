@@ -59,14 +59,28 @@ public class UserController {
     public ResponseEntity<Void> updateFcmToken(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody FcmTokenUpdateRequest request) {
-        // 여기서 “요청 진입” 로그
-        log.info("[UserController.updateFcmToken] 호출됨 → userEmail={}, 요청 FCM 토큰={}",
+        // 1) userDetails 체크
+        if (userDetails == null) {
+            log.warn("[UserController.updateFcmToken] 인증 정보 없음(토큰이 없거나 만료) → 401 반환");
+            throw new RuntimeException("인증 정보가 없습니다");  // → 전역 핸들러로 던지면 스택트레이스가 남음
+        }
+        if (request == null || request.getFcmToken() == null || request.getFcmToken().isBlank()) {
+            log.warn("[UserController.updateFcmToken] 잘못된 요청: request 또는 fcmToken 누락");
+            throw new IllegalArgumentException("유효하지 않은 FCM 토큰");
+        }
+
+        log.info("[UserController.updateFcmToken] 호출됨 → 사용자={}, 요청토큰={}",
                 userDetails.getUsername(), request.getFcmToken());
 
-        userService.updateFcmToken(userDetails.getUsername(), request.getFcmToken());
+        try {
+            userService.updateFcmToken(userDetails.getUsername(), request.getFcmToken());
+        } catch (Exception e) {
+            // 2) 서비스 레이어에서 발생하는 예외를 catch 하지 않고 전역 핸들러로 전달
+            log.error("[UserController.updateFcmToken] 서비스 호출 중 예외: ", e);
+            throw e;  // → GlobalExceptionHandler.handleException으로 전파
+        }
 
-        // “업데이트 완료” 로그
-        log.info("[UserController.updateFcmToken] FCM 토큰 업데이트 성공 → userEmail={}", userDetails.getUsername());
+        log.info("[UserController.updateFcmToken] FCM 토큰 업데이트 성공");
         return ResponseEntity.ok().build();
     }
 }

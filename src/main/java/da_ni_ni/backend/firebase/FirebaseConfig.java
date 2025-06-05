@@ -11,58 +11,63 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Base64;
 
-@Slf4j
 @Configuration
+@Slf4j
 public class FirebaseConfig {
 
-    /** 운영 환경(Render)에서만 설정해 두는 환경 변수 */
     @Value("${FIREBASE_SERVICE_ACCOUNT_JSON:}")
     private String firebaseServiceAccountJson;
 
     @PostConstruct
     public void initFirebase() throws IOException {
-        InputStream serviceAccountStream;
+        log.info("[FirebaseConfig.initFirebase] 진입 → FIREBASE_SERVICE_ACCOUNT_JSON={}", firebaseServiceAccountJson);
 
-        if (firebaseServiceAccountJson != null && !firebaseServiceAccountJson.isBlank()) {
-            // 운영 환경: 환경 변수에서 받아온 JSON 문자열을 임시 파일로 만들기
-            Path tempFilePath = Files.createTempFile("firebase-service-account-", ".json");
-            Files.write(tempFilePath, firebaseServiceAccountJson.getBytes(StandardCharsets.UTF_8));
-            tempFilePath.toFile().deleteOnExit();
-            serviceAccountStream = new FileInputStream(tempFilePath.toFile());
-            log.info("Firebase Credential: 운영 환경에서 임시 파일을 만들어 읽어옵니다.");
+        InputStream serviceAccountStream;
+        if (firebaseServiceAccountJson != null && !firebaseServiceAccountJson.isEmpty()) {
+            // 환경 변수에 인코딩된 JSON 문자열이 들어왔나 확인
+            if (firebaseServiceAccountJson.startsWith("-----BEGIN")) {
+                byte[] decoded = Base64.getDecoder().decode(firebaseServiceAccountJson);
+                serviceAccountStream = new ByteArrayInputStream(decoded);
+                log.info("[FirebaseConfig] Base64 인코딩된 JSON 스트림으로 로드 완료");
+            } else {
+                // classpath:xxx 형태인지 확인
+                log.info("[FirebaseConfig] ClassPathResource 로드 시도 → path={}", firebaseServiceAccountJson);
+                ClassPathResource resource = new ClassPathResource(firebaseServiceAccountJson);
+                log.info("[FirebaseConfig] ClassPathResource.exists()={}", resource.exists());
+                serviceAccountStream = resource.getInputStream();
+                log.info("[FirebaseConfig] ClassPathResource 로드 성공 → {}", firebaseServiceAccountJson);
+            }
         } else {
-            // 로컬 개발 환경: resources 폴더에서 직접 JSON 파일 읽기
+            // 로컬 개발용 루트 리소스 경로
+            log.info("[FirebaseConfig] 로컬 resources에서 JSON 로드 시도");
             ClassPathResource resource = new ClassPathResource("danini-firebase-service-account.json");
+            log.info("[FirebaseConfig] 로컬 JSON 파일 존재 여부: {}", resource.exists());
             serviceAccountStream = resource.getInputStream();
-            log.info("Firebase Credential: 로컬 resources 폴더에서 JSON 파일을 읽어옵니다.");
+            log.info("[FirebaseConfig] 로컬 서비스 계정 JSON 로드 완료");
         }
 
-        try (serviceAccountStream) {
+        try {
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccountStream))
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
-                log.info("Firebase 애플리케이션이 초기화되었습니다.");
+                log.info("[FirebaseConfig] Firebase 애플리케이션 초기화 완료");
             }
-        } catch (IOException e) {
-            log.error("Firebase 초기화 중 오류 발생: ", e);
-            throw e;
+        } catch (Exception e) {
+            log.error("[FirebaseConfig] Firebase 초기화 중 예외 발생", e);
+            throw e;  // 프로그램 구동 중단(BeanCreationException) → 스택트레이스가 로그에 찍힘
         }
     }
 
-    /** FirebaseMessaging 인스턴스를 빈으로 등록 */
     @Bean
     public FirebaseMessaging firebaseMessaging() {
-        // initFirebase()에서 FirebaseApp이 초기화되었으므로, 바로 인스턴스를 반환할 수 있습니다.
         return FirebaseMessaging.getInstance();
     }
 }
