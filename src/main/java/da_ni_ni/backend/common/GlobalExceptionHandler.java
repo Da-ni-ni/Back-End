@@ -74,14 +74,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponseDto> handleException(Exception ex) {
+//        ErrorResponseDto body = new ErrorResponseDto(
+//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                "서버 오류가 발생했습니다."
+//        );
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+//    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception ex) {
+        // 1) 콘솔에 스택트레이스를 찍는다.
+        log.error("[GlobalExceptionHandler] 예외 발생", ex);
+
+        // 2) 디버깅용으로 ex.getMessage()를 응답에 포함해 본다.
+        String detailMessage = ex.getMessage();
+        // 예시: detailMessage가 null일 수도 있으니, null check
+        if (detailMessage == null) {
+            detailMessage = "Unknown error";
+        }
+
         ErrorResponseDto body = new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "서버 오류가 발생했습니다."
+                detailMessage  // ex.getMessage()를 그대로 내려준다
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ResponseEntity<ErrorResponseDto> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
