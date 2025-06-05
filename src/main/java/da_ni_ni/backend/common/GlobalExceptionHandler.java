@@ -13,6 +13,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -85,19 +86,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception ex) {
-        // 1) 콘솔에 스택트레이스를 찍는다.
         log.error("[GlobalExceptionHandler] 예외 발생", ex);
-
-        // 2) 디버깅용으로 ex.getMessage()를 응답에 포함해 본다.
-        String detailMessage = ex.getMessage();
-        // 예시: detailMessage가 null일 수도 있으니, null check
-        if (detailMessage == null) {
-            detailMessage = "Unknown error";
-        }
-
         ErrorResponseDto body = new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                detailMessage  // ex.getMessage()를 그대로 내려준다
+                ex.getMessage() // 디버깅용으로 예외 메시지를 그대로 내려줍니다.
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
@@ -146,5 +138,16 @@ public class GlobalExceptionHandler {
                 "데이터베이스 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
         );
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    //  JSON 바인딩 실패 전용 예외 핸들러 추가
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadJson(HttpMessageNotReadableException ex) {
+        log.error("[GlobalExceptionHandler] JSON 바인딩 실패", ex);
+        ErrorResponseDto body = new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.value(),
+                "잘못된 JSON 형식입니다: " + ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 }

@@ -59,28 +59,42 @@ public class UserController {
     public ResponseEntity<Void> updateFcmToken(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody FcmTokenUpdateRequest request) {
+
+        // 강제 로그 추가: 메서드 진입 여부
+        log.info("[UserController.updateFcmToken] 진입 → userDetails={}, request={}",
+                userDetails, request);
+
         // 1) userDetails 체크
         if (userDetails == null) {
-            log.warn("[UserController.updateFcmToken] 인증 정보 없음(토큰이 없거나 만료) → 401 반환");
-            throw new RuntimeException("인증 정보가 없습니다");  // → 전역 핸들러로 던지면 스택트레이스가 남음
-        }
-        if (request == null || request.getFcmToken() == null || request.getFcmToken().isBlank()) {
-            log.warn("[UserController.updateFcmToken] 잘못된 요청: request 또는 fcmToken 누락");
-            throw new IllegalArgumentException("유효하지 않은 FCM 토큰");
+            log.warn("[UserController.updateFcmToken] 인증 정보가 없습니다 (userDetails == null)");
+            throw new RuntimeException("인증 정보가 없습니다");
         }
 
-        log.info("[UserController.updateFcmToken] 호출됨 → 사용자={}, 요청토큰={}",
+        // 2) request.getFcmToken() 체크
+        if (request == null) {
+            log.warn("[UserController.updateFcmToken] Request 바인딩이 안 됨 (request == null)");
+            throw new RuntimeException("요청 바디가 비어 있습니다");
+        }
+        if (request.getFcmToken() == null) {
+            log.warn("[UserController.updateFcmToken] fcmToken이 null입니다 → request={}", request);
+            throw new RuntimeException("유효하지 않은 FCM 토큰: null");
+        }
+        if (request.getFcmToken().isBlank()) {
+            log.warn("[UserController.updateFcmToken] fcmToken이 빈 문자열입니다 → request={}", request);
+            throw new RuntimeException("유효하지 않은 FCM 토큰: 빈 문자열");
+        }
+
+        log.info("[UserController.updateFcmToken] userDetails.getUsername()={}, request.getFcmToken()={}",
                 userDetails.getUsername(), request.getFcmToken());
 
         try {
             userService.updateFcmToken(userDetails.getUsername(), request.getFcmToken());
         } catch (Exception e) {
-            // 2) 서비스 레이어에서 발생하는 예외를 catch 하지 않고 전역 핸들러로 전달
-            log.error("[UserController.updateFcmToken] 서비스 호출 중 예외: ", e);
-            throw e;  // → GlobalExceptionHandler.handleException으로 전파
+            log.error("[UserController.updateFcmToken] userService.updateFcmToken 중 예외 발생", e);
+            throw e;  // 전역 핸들러로 전파
         }
 
-        log.info("[UserController.updateFcmToken] FCM 토큰 업데이트 성공");
+        log.info("[UserController.updateFcmToken] FCM 토큰 업데이트 정상 종료");
         return ResponseEntity.ok().build();
     }
 }
