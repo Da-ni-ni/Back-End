@@ -9,12 +9,14 @@ import da_ni_ni.backend.user.exception.LoginFailedException;
 import da_ni_ni.backend.user.jwt.JwtTokenProvider;
 import da_ni_ni.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -109,11 +111,12 @@ public class UserService {
      */
     @Transactional
     public void updateFcmToken(String email, String fcmToken) {
+        log.info("[UserService.updateFcmToken] 이메일={}, 업데이트할 토큰={}", email, fcmToken);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + email));
-
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음: " + email));
+        log.info("[UserService.updateFcmToken] 사용자 조회 성공, ID={}", user.getId());
         user.updateFcmToken(fcmToken);
         userRepository.save(user);
+        log.info("[UserService.updateFcmToken] userRepository.save() 완료");
     }
-
 }

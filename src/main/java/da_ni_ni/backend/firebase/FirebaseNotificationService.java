@@ -28,6 +28,9 @@ public class FirebaseNotificationService {
      * @return 메시지 ID
      */
     public String sendNotification(String token, String title, String body, Map<String, String> data) {
+        log.info("[FirebaseNotificationService.sendNotification] 진입 → token={}, title={}, body={}, data={}",
+                token, title, body, data);
+
         if (token == null || token.isEmpty()) {
             log.warn("유효하지 않은 FCM 토큰: {}", token);
             return null;

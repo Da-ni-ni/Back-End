@@ -1,5 +1,6 @@
 package da_ni_ni.backend.common;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import da_ni_ni.backend.qna.exception.BadRequestException;
 import da_ni_ni.backend.qna.exception.ForbiddenException;
 import da_ni_ni.backend.user.dto.ErrorResponseDto;
@@ -7,13 +8,18 @@ import da_ni_ni.backend.user.exception.DuplicateEmailException;
 import da_ni_ni.backend.user.exception.ExpiredRefreshTokenException;
 import da_ni_ni.backend.user.exception.InvalidRefreshTokenException;
 import da_ni_ni.backend.user.exception.LoginFailedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.stream.Collectors;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -37,16 +43,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        // 가장 첫 번째 검증 오류 메시지를 꺼내서 응답에 담습니다.
-        String errorMessage = ex.getBindingResult().getAllErrors().stream()
+        // 여러 필드 오류 메시지를 모두 수집
+        String messages = ex.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .findFirst()
-                .orElse("잘못된 요청입니다.");
-        ErrorResponseDto body = new ErrorResponseDto(
+                .collect(Collectors.joining("; "));
+        log.warn("[GlobalExceptionHandler] 유효성 검사 실패: {}", messages);
+
+        ErrorResponseDto error = new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.value(),
-                errorMessage
+                messages  // "username은 필수입니다; password길이는 8자 이상이어야 합니다."
         );
-        return ResponseEntity.badRequest().body(body);
+        return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
@@ -92,4 +99,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);  // 400 상태로 반환
     }
 
+    /**
+     * firebase 오류
+     */
+    @ExceptionHandler(com.google.firebase.messaging.FirebaseMessagingException.class)
+    public ResponseEntity<ErrorResponseDto> handleFirebaseMessagingException(FirebaseMessagingException ex) {
+        // 1) 어떤 토큰/토픽 전송에서 오류가 났는지 로그
+        log.error("[GlobalExceptionHandler] FCM 전송 예외 발생: {}", ex.getErrorCode(), ex);
+
+        // 2) 예외 메시지를 그대로 전달하거나, “FCM 전송 실패”로 통일
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.BAD_GATEWAY.value(),  // FCM과의 통신 오류일 경우 502 Bad Gateway 정도로 써도 무방합니다.
+                "푸시 알림 전송 중 오류가 발생했습니다: " + ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(error);
+    }
+
+    /**
+     * db 연결 오류
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponseDto> handleDataAccessException(DataAccessException ex) {
+        log.error("[GlobalExceptionHandler] DB 예외 발생", ex);
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),  // DB 연결 문제 시 503으로 응답해도 괜찮습니다.
+                "데이터베이스 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
 }
