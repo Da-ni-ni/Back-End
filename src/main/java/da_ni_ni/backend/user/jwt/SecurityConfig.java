@@ -6,6 +6,7 @@ import da_ni_ni.backend.user.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -87,14 +88,21 @@ public class SecurityConfig {
                         .accessDeniedHandler(jsonAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // 1) OPTIONS 프리플라이트 요청 허용 → 맨 위에 추가
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // 2) 로그인이 필요 없는 엔드포인트들
                         .requestMatchers(
                                 "/api/v1/users/signup",
                                 "/api/v1/users/login",
                                 "/api/v1/users/check-email",
                                 "/api/v1/users/reissue"  // 토큰 재발급은 인증 없이 접근 가능
                         ).permitAll()
+
+                        // 3) 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
+                // 4) JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .addFilterBefore(jwtAuthenticationFilter(),
                         UsernamePasswordAuthenticationFilter.class);
 
